@@ -1,0 +1,35 @@
+{
+	"parent": "minecraft:recipes/root",
+	"rewards": {
+		"recipes": [
+			"giftit:gift_paper"
+		]
+	},
+	"criteria": {
+		"has_paper": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"item": "minecraft:paper",
+						"count": {
+							"min": 3
+						}
+					}
+				]
+			}
+		},
+		"has_the_recipe": {
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions": {
+				"recipe": "giftit:gift_paper"
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_paper",
+			"has_the_recipe"
+		]
+	]
+}

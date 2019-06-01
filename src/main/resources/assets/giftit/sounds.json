@@ -1,0 +1,14 @@
+{
+	"gift.wrap": {
+		"subtitle": "gift.wrap",
+		"sounds": [
+			"giftit:gift_wrap"
+		]
+	},
+	"gift.unwrap": {
+		"subtitle": "gift.unwrap",
+		"sounds": [
+			"giftit:gift_unwrap"
+		]
+	}
+}

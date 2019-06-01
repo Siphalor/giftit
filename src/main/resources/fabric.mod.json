@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "giftit",
+	"version": "${version}",
+
+	"name": "Gift It!",
+	"description": "Wrap your blocks into gifts and offer them your friends.",
+	"authors": [
+		"Siphalor"
+	],
+	"contact": {
+		"homepage": "https://github.com/Siphalor/giftit",
+		"sources": "https://github.com/Siphalor/giftit"
+	},
+
+	"license": "CC0-1.0",
+	"icon": "assets/giftit/icon.png",
+
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"de.siphalor.giftit.Core"
+		]
+	},
+
+	"depends": {
+		"fabricloader": ">=0.4.0"
+	}
+}

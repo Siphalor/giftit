@@ -1,0 +1,7 @@
+{
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "giftit:item/gift_paper_base",
+		"layer1": "giftit:item/gift_paper_ribbon"
+	}
+}

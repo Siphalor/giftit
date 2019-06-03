@@ -6,16 +6,10 @@ import net.fabricmc.fabric.api.client.render.ColorProviderRegistry;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.Item;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import static de.siphalor.giftit.Core.*;
 
 public class ClientCore implements ClientModInitializer {
-	public static final SoundEvent GIFT_WRAP_SOUND = registerSound("gift.wrap");
-	public static final SoundEvent GIFT_UNWRAP_SOUND = registerSound("gift.unwrap");
-
 	@Override
 	public void onInitializeClient() {
 		GIFT_BLOCK_ITEM.registerBlockItemMap(Item.BLOCK_ITEM_MAP, GIFT_BLOCK_ITEM);
@@ -40,10 +34,5 @@ public class ClientCore implements ClientModInitializer {
 			}
 			return -1;
 		}, GIFT_BLOCK);
-	}
-
-	public static SoundEvent registerSound(String name) {
-		Identifier identifier = new Identifier(MOD_ID, name);
-		return Registry.register(Registry.SOUND_EVENT, identifier, new SoundEvent(identifier));
 	}
 }

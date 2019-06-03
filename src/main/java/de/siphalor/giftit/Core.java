@@ -20,8 +20,15 @@ public class Core implements ModInitializer {
 
     public static final GiftPaperItem GIFT_PAPER = Registry.register(Registry.ITEM, new Identifier(MOD_ID, "gift_paper"), new GiftPaperItem());
 
+    public static final SoundEvent GIFT_WRAP_SOUND = registerSound("gift.wrap");
+    public static final SoundEvent GIFT_UNWRAP_SOUND = registerSound("gift.unwrap");
+
 	@Override
 	public void onInitialize() {
 	}
 
+	public static SoundEvent registerSound(String name) {
+    	Identifier identifier = new Identifier(MOD_ID, name);
+    	return Registry.register(Registry.SOUND_EVENT, identifier, new SoundEvent(identifier));
+	}
 }

@@ -20,6 +20,9 @@
 	"entrypoints": {
 		"main": [
 			"de.siphalor.giftit.Core"
+		],
+		"client": [
+			"de.siphalor.giftit.client.ClientCore"
 		]
 	},
 

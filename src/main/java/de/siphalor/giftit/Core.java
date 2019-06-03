@@ -20,37 +20,8 @@ public class Core implements ModInitializer {
 
     public static final GiftPaperItem GIFT_PAPER = Registry.register(Registry.ITEM, new Identifier(MOD_ID, "gift_paper"), new GiftPaperItem());
 
-    public static final SoundEvent GIFT_WRAP_SOUND = registerSound("gift.wrap");
-    public static final SoundEvent GIFT_UNWRAP_SOUND = registerSound("gift.unwrap");
-
 	@Override
 	public void onInitialize() {
-		GIFT_BLOCK_ITEM.registerBlockItemMap(Item.BLOCK_ITEM_MAP, GIFT_BLOCK_ITEM);
-
-		ColorProviderRegistry.ITEM.register((itemStack, layer) -> {
-			int baseColor = ((DyeableItem) itemStack.getItem()).getColor(itemStack);
-			if(layer == 1) {
-				return baseColor ^ 0x00ffffff;
-			} else {
-				return baseColor;
-			}
-		}, GIFT_BLOCK_ITEM, GIFT_PAPER);
-		ColorProviderRegistry.BLOCK.register((blockState, blockView, blockPos, tintIndex) -> {
-			BlockEntity blockEntity = blockView.getBlockEntity(blockPos);
-			if(blockEntity instanceof GiftBlockEntity) {
-				int baseColor = ((GiftBlockEntity) blockEntity).getColor();
-				if(tintIndex == 1) {
-					return baseColor ^ 0x00ffffff;
-				} else {
-					return baseColor;
-				}
-			}
-			return -1;
-		}, GIFT_BLOCK);
 	}
 
-	public static SoundEvent registerSound(String name) {
-    	Identifier identifier = new Identifier(MOD_ID, name);
-    	return Registry.register(Registry.SOUND_EVENT, identifier, new SoundEvent(identifier));
-	}
 }

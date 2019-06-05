@@ -23,6 +23,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 		BlockPos blockPos = itemUsageContext.getBlockPos();
 		if(!world.isClient()) {
 			BlockState blockState = world.getBlockState(blockPos);
+			if(Core.NONWRAPPABLE_BLOCKS.contains(blockState.getBlock())) return ActionResult.PASS;
 			if(blockState.getBlock() == Core.GIFT_BLOCK) return ActionResult.PASS;
 			CompoundTag data = null;
 			BlockEntity blockEntity = world.getBlockEntity(blockPos);

@@ -1,4 +1,4 @@
-# Fabric Example Mod
+# Gift It!
 
 [![curseforge downloads](http://cf.way2muchnoise.eu/full_gift-it_downloads.svg)](https://minecraft.curseforge.com/projects/gift-it)
 [![curseforge mc versions](http://cf.way2muchnoise.eu/versions/gift-it.svg)](https://minecraft.curseforge.com/projects/gift-it)

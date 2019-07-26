@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.2.2-SNAPSHOT'
+	id 'fabric-loom' version '0.2.5-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -13,10 +13,17 @@ group = project.maven_group
 minecraft {
 }
 
+repositories {
+	maven {
+		name "jitpack"
+		url "https://jitpack.io/"
+	}
+}
+
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}"
+	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}"
 	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modCompile "net.fabricmc.fabric-api:fabric-api-base:+"
@@ -37,6 +44,14 @@ dependencies {
 	include "net.fabricmc.fabric-api:fabric-registry-sync-v0:+"
 	modCompile "net.fabricmc.fabric-api:fabric-networking-v0:+"
 	include "net.fabricmc.fabric-api:fabric-networking-v0:+"
+
+	modCompile "com.github.siphalor:tweed-api:2.2.2"
+	include "com.github.siphalor:tweed-api:2.2.2"
+
+	modCompile "me.shedaniel.cloth:config-2:0.4.1"
+	include "me.shedaniel.cloth:config-2:0.4.1"
+
+	modImplementation "io.github.prospector.modmenu:ModMenu:+"
 }
 
 processResources {

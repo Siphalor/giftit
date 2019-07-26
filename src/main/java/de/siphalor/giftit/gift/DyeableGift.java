@@ -1,4 +1,4 @@
-package de.siphalor.giftit;
+package de.siphalor.giftit.gift;
 
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
@@ -7,13 +7,13 @@ import net.minecraft.nbt.CompoundTag;
 public interface DyeableGift extends DyeableItem {
 	@Override
 	default boolean hasColor(ItemStack itemStack) {
-		CompoundTag compoundTag = itemStack.getSubCompoundTag("BlockEntityTag");
+		CompoundTag compoundTag = itemStack.getSubTag("BlockEntityTag");
 		return compoundTag != null && compoundTag.containsKey("color", 99);
 	}
 
 	@Override
 	default int getColor(ItemStack itemStack) {
-		CompoundTag compoundTag = itemStack.getSubCompoundTag("BlockEntityTag");
+		CompoundTag compoundTag = itemStack.getSubTag("BlockEntityTag");
 		return compoundTag != null && compoundTag.containsKey("color", 99) ? compoundTag.getInt("color") : getDefaultValue();
 	}
 
@@ -23,13 +23,13 @@ public interface DyeableGift extends DyeableItem {
 
 	@Override
 	default void removeColor(ItemStack itemStack) {
-		CompoundTag compoundTag = itemStack.getSubCompoundTag("BlockEntityTag");
+		CompoundTag compoundTag = itemStack.getSubTag("BlockEntityTag");
 		if(compoundTag != null && compoundTag.containsKey("color"))
 			compoundTag.remove("color");
 	}
 
 	@Override
 	default void setColor(ItemStack itemStack, int color) {
-		itemStack.getOrCreateSubCompoundTag("BlockEntityTag").putInt("color", color);
+		itemStack.getOrCreateSubTag("BlockEntityTag").putInt("color", color);
 	}
 }

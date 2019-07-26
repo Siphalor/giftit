@@ -1,20 +1,28 @@
 package de.siphalor.giftit;
 
+import de.siphalor.giftit.gift.GiftBlock;
+import de.siphalor.giftit.gift.GiftBlockEntity;
+import de.siphalor.giftit.gift.GiftBlockItem;
+import de.siphalor.giftit.gift.GiftPaperItem;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.render.ColorProviderRegistry;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
+import net.minecraft.block.dispenser.DispenserBehavior;
+import net.minecraft.block.dispenser.FallibleItemDispenserBehavior;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.DyeableItem;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.Tag;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.registry.Registry;
 
-public class Core implements ModInitializer {
+public class GiftIt implements ModInitializer {
 	public static final String MOD_ID = "giftit";
 
 	public static final Block GIFT_BLOCK = Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "gift"), new GiftBlock());
@@ -30,9 +38,20 @@ public class Core implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		DispenserBlock.registerBehavior(GIFT_PAPER, new FallibleItemDispenserBehavior() {
+			@Override
+			public ItemStack dispenseSilently(BlockPointer blockPointer, ItemStack itemStack) {
+				success = GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING)));
+				itemStack.split(1);
+				return itemStack;
+			}
+		});
+		DispenserBlock.registerBehavior(GIFT_BLOCK_ITEM, new BlockPlacementDispenserBehavior());
 	}
 
-	public static SoundEvent registerSound(String name) {
+	private static SoundEvent registerSound(String name) {
+		Config.initialize();
+
     	Identifier identifier = new Identifier(MOD_ID, name);
     	return Registry.register(Registry.SOUND_EVENT, identifier, new SoundEvent(identifier));
 	}

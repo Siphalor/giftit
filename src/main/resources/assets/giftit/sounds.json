@@ -2,13 +2,17 @@
 	"gift.wrap": {
 		"subtitle": "gift.wrap",
 		"sounds": [
-			"giftit:gift_wrap"
+			"giftit:gift_wrap_0",
+			"giftit:gift_wrap_1",
+			"giftit:gift_wrap_2",
+			"giftit:gift_wrap_3"
 		]
 	},
 	"gift.unwrap": {
 		"subtitle": "gift.unwrap",
 		"sounds": [
-			"giftit:gift_unwrap"
+			"giftit:gift_unwrap_0",
+			"giftit:gift_unwrap_1"
 		]
 	}
 }

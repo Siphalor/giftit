@@ -1,5 +1,9 @@
 {
 	"item.giftit.gift_paper": "Gift Paper",
 	"item.giftit.gift": "Gift",
-	"block.giftit.gift": "Gift"
+	"block.giftit.gift": "Gift",
+
+	"tweed.cloth.giftit": "Gift It! Configuration",
+	"tweed.cloth.giftit.main": "General",
+	"tweed.cloth.giftit.main.max-paper-damage": "Gift Paper Uses"
 }

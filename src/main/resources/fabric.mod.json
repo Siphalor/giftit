@@ -10,7 +10,8 @@
 	],
 	"contact": {
 		"homepage": "https://github.com/Siphalor/giftit",
-		"sources": "https://github.com/Siphalor/giftit"
+		"sources": "https://github.com/Siphalor/giftit",
+		"issues": "https://github.com/Siphalor/giftit/issues"
 	},
 
 	"license": "CC0-1.0",
@@ -23,8 +24,14 @@
 		],
 		"client": [
 			"de.siphalor.giftit.client.ClientCore"
+		],
+		"modmenu": [
+			"de.siphalor.giftit.client.ModMenuEntryPoint"
 		]
 	},
+	"mixins": [
+		"giftit.mixins.json"
+	],
 
 	"depends": {
 		"fabricloader": ">=0.4.0"

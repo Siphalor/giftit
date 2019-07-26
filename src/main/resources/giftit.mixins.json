@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "de.siphalor.giftit.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+		"MixinItem",
+		"MixinShearsDispenserBehavior"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

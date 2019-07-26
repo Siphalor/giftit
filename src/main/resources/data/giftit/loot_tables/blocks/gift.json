@@ -1,0 +1,46 @@
+{
+	"type": "minecraft:block",
+	"pools": [
+		{
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "giftit:gift",
+					"functions": [
+						{
+							"function": "minecraft:copy_nbt",
+							"source": "block_entity",
+							"ops": [
+								{
+									"source": "WrappedState",
+									"target": "BlockEntityTag.WrappedState",
+									"op": "replace"
+								},
+								{
+									"source": "WrappedData",
+									"target": "BlockEntityTag.WrappedData",
+									"op": "replace"
+								},
+								{
+									"source": "color",
+									"target": "BlockEntityTag.color",
+									"op": "replace"
+								},
+								{
+									"source": "PaperDamage",
+									"target": "BlockEntityTag.PaperDamage",
+									"op": "replace"
+								}
+							]
+						},
+						{
+							"function": "minecraft:copy_name",
+							"source": "block_entity"
+						}
+					]
+				}
+			]
+		}
+	]
+}

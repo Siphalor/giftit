@@ -42,7 +42,7 @@ public class GiftIt implements ModInitializer {
 			@Override
 			public ItemStack dispenseSilently(BlockPointer blockPointer, ItemStack itemStack) {
 				success = GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING)));
-				itemStack.split(1);
+				itemStack.decrement(1);
 				return itemStack;
 			}
 		});

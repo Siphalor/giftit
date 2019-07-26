@@ -20,7 +20,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"de.siphalor.giftit.Core"
+			"de.siphalor.giftit.GiftIt"
 		],
 		"client": [
 			"de.siphalor.giftit.client.ClientCore"

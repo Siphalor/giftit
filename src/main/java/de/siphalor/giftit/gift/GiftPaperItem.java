@@ -24,7 +24,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 		BlockPos blockPos = itemUsageContext.getBlockPos();
 		if(!world.isClient()) {
 			if(tryWrapBlock(itemUsageContext.getStack(), world, blockPos) && itemUsageContext.getPlayer() != null)
-				itemUsageContext.getStack().split(1);
+				itemUsageContext.getStack().decrement(1);
 		}
 
 		return ActionResult.SUCCESS;

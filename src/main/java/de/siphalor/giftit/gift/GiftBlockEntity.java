@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.datafixers.NbtOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -72,19 +73,20 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	@Override
 	public void fromTag(CompoundTag compoundTag) {
 		super.fromTag(compoundTag);
-		wrappedBlockState = new Dynamic<>(NbtOps.INSTANCE, compoundTag.getTag("WrappedState"));
+		wrappedBlockState = new Dynamic<>(NbtOps.INSTANCE, compoundTag.getCompound("WrappedState"));
 
-		if(compoundTag.containsKey("WrappedData")) {
-			wrappedBlockData = (CompoundTag) compoundTag.getTag("WrappedData");
+		if(compoundTag.contains("WrappedData")) {
+			wrappedBlockData = compoundTag.getCompound("WrappedData");
 		}
 		color = compoundTag.getInt("color");
 		if(!Config.unbreakableGiftPaper) {
-			if(compoundTag.containsKey("PaperDamage"))
+			if(compoundTag.contains("PaperDamage"))
 				paperDamage = compoundTag.getInt("PaperDamage");
-			paperDamage = 0;
+			else
+				paperDamage = 0;
 		}
 
-		if(compoundTag.containsKey("CustomName"))
+		if(compoundTag.contains("CustomName"))
 			customName = Text.Serializer.fromJson(compoundTag.getString("CustomName"));
 	}
 
@@ -109,7 +111,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	public void fromClientTag(CompoundTag tag) {
 		color = tag.getInt("color");
 		if(world != null)
-			world.scheduleBlockRender(pos, null, getCachedState());
+			MinecraftClient.getInstance().worldRenderer.updateBlock(world, pos, null, getCachedState(), 3);
 	}
 
 	@Override

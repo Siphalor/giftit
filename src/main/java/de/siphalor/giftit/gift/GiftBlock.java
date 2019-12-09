@@ -3,7 +3,10 @@ package de.siphalor.giftit.gift;
 import de.siphalor.giftit.Config;
 import de.siphalor.giftit.GiftIt;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.client.network.packet.TitleS2CPacket;
@@ -14,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Clearable;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -41,12 +45,12 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 	}
 
 	@Override
-	public boolean activate(BlockState blockState, World world, BlockPos blockPos, PlayerEntity playerEntity, Hand hand, BlockHitResult blockHitResult) {
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if(!world.isClient()) {
-			unwrap(world, blockPos, blockHitResult.getSide(), playerEntity);
+			unwrap(world, pos, hit.getSide(), player);
 		}
 
-		return true;
+		return ActionResult.SUCCESS;
 	}
 
 	@Override
@@ -59,20 +63,10 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 		return new GiftBlockEntity();
 	}
 
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT_MIPPED;
-	}
-
-	@Override
-	public boolean isOpaque(BlockState blockState_1) {
-		return true;
-	}
-
 	public void unwrap(World world, BlockPos blockPos, Direction activationDirection, PlayerEntity playerEntity) {
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
 		if(blockEntity instanceof GiftBlockEntity) {
-			if(Config.unbreakableGiftPaper || ((GiftBlockEntity) blockEntity).getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1) {
+			if(Config.unbreakableGiftPaper || ((GiftBlockEntity) blockEntity).getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && !playerEntity.isCreative()) {
 				ItemStack itemStack = new ItemStack(GiftIt.GIFT_PAPER);
 				if(!Config.unbreakableGiftPaper)
 					itemStack.setDamage(((GiftBlockEntity) blockEntity).getPaperDamage() + 1);

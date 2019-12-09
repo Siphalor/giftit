@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.2.5-SNAPSHOT'
+	id 'fabric-loom' version '0.2.6-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -28,6 +28,8 @@ dependencies {
 
 	modCompile "net.fabricmc.fabric-api:fabric-api-base:+"
 	include "net.fabricmc.fabric-api:fabric-api-base:+"
+	modCompile "net.fabricmc.fabric-api:fabric-blockrenderlayer-v1:+"
+	include "net.fabricmc.fabric-api:fabric-blockrenderlayer-v1:+"
 	modCompile "net.fabricmc.fabric-api:fabric-mining-levels-v0:+"
 	include "net.fabricmc.fabric-api:fabric-mining-levels-v0:+"
 	modCompile "net.fabricmc.fabric-api:fabric-tag-extensions-v0:+"
@@ -44,14 +46,24 @@ dependencies {
 	include "net.fabricmc.fabric-api:fabric-registry-sync-v0:+"
 	modCompile "net.fabricmc.fabric-api:fabric-networking-v0:+"
 	include "net.fabricmc.fabric-api:fabric-networking-v0:+"
+	modCompile "net.fabricmc.fabric-api:fabric-events-lifecycle-v0:+"
+	include "net.fabricmc.fabric-api:fabric-events-lifecycle-v0:+"
 
-	modCompile "com.github.siphalor:tweed-api:2.2.2"
-	include "com.github.siphalor:tweed-api:2.2.2"
+	modCompile("com.github.siphalor:tweed-api:${project.tweed_version}") {
+        exclude group: "net.fabricmc.fabric-api"
+		exclude module: "modmenu"
+	}
+	include "com.github.siphalor:tweed-api:${project.tweed_version}"
 
-	modCompile "me.shedaniel.cloth:config-2:0.4.1"
-	include "me.shedaniel.cloth:config-2:0.4.1"
+	modCompile("me.shedaniel.cloth:config-2:${project.cloth_config_version}") {
+		exclude group: "net.fabricmc.fabric-api"
+		exclude module: "modmenu"
+	}
+	include "me.shedaniel.cloth:config-2:${project.cloth_config_version}"
 
-	modImplementation "io.github.prospector.modmenu:ModMenu:+"
+	modImplementation ("io.github.prospector.modmenu:ModMenu:+") {
+		exclude group: "net.fabricmc.fabric-api"
+	}
 }
 
 processResources {

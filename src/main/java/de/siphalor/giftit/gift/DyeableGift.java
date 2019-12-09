@@ -8,13 +8,13 @@ public interface DyeableGift extends DyeableItem {
 	@Override
 	default boolean hasColor(ItemStack itemStack) {
 		CompoundTag compoundTag = itemStack.getSubTag("BlockEntityTag");
-		return compoundTag != null && compoundTag.containsKey("color", 99);
+		return compoundTag != null && compoundTag.contains("color", 99);
 	}
 
 	@Override
 	default int getColor(ItemStack itemStack) {
 		CompoundTag compoundTag = itemStack.getSubTag("BlockEntityTag");
-		return compoundTag != null && compoundTag.containsKey("color", 99) ? compoundTag.getInt("color") : getDefaultValue();
+		return compoundTag != null && compoundTag.contains("color", 99) ? compoundTag.getInt("color") : getDefaultValue();
 	}
 
 	static int getDefaultValue() {
@@ -24,7 +24,7 @@ public interface DyeableGift extends DyeableItem {
 	@Override
 	default void removeColor(ItemStack itemStack) {
 		CompoundTag compoundTag = itemStack.getSubTag("BlockEntityTag");
-		if(compoundTag != null && compoundTag.containsKey("color"))
+		if(compoundTag != null && compoundTag.contains("color"))
 			compoundTag.remove("color");
 	}
 

@@ -4,6 +4,7 @@ import de.siphalor.giftit.GiftIt;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
@@ -15,7 +16,7 @@ import net.minecraft.world.World;
 
 public class GiftPaperItem extends Item implements DyeableGift {
 	public GiftPaperItem() {
-		super(new Settings().maxDamage(4));
+		super(new Settings().maxDamage(4).group(ItemGroup.MISC));
 	}
 
 	@Override

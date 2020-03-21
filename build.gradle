@@ -7,7 +7,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
-version = "${project.mod_version}+${project.minecraft_version}"
+version = "${project.mod_version}+mc${project.minecraft_version}"
 group = project.maven_group
 
 minecraft {
@@ -34,8 +34,8 @@ dependencies {
 	include "net.fabricmc.fabric-api:fabric-mining-levels-v0:+"
 	modCompile "net.fabricmc.fabric-api:fabric-tag-extensions-v0:+"
 	include "net.fabricmc.fabric-api:fabric-tag-extensions-v0:+"
-	modCompile "net.fabricmc.fabric-api:fabric-rendering-v0:+"
-	include "net.fabricmc.fabric-api:fabric-rendering-v0:+"
+	modCompile "net.fabricmc.fabric-api:fabric-rendering-v1:+"
+	include "net.fabricmc.fabric-api:fabric-rendering-v1:+"
 	modCompile "net.fabricmc.fabric-api:fabric-object-builders-v0:+"
 	include "net.fabricmc.fabric-api:fabric-object-builders-v0:+"
 	modCompile "net.fabricmc.fabric-api:fabric-resource-loader-v0:+"
@@ -46,8 +46,8 @@ dependencies {
 	include "net.fabricmc.fabric-api:fabric-registry-sync-v0:+"
 	modCompile "net.fabricmc.fabric-api:fabric-networking-v0:+"
 	include "net.fabricmc.fabric-api:fabric-networking-v0:+"
-	modCompile "net.fabricmc.fabric-api:fabric-events-lifecycle-v0:+"
-	include "net.fabricmc.fabric-api:fabric-events-lifecycle-v0:+"
+	modCompile "net.fabricmc.fabric-api:fabric-events-lifecycle-v0:0.1.2+b7f9825dd1"
+	include "net.fabricmc.fabric-api:fabric-events-lifecycle-v0:0.1.2+b7f9825dd1"
 
 	modCompile("com.github.siphalor:tweed-api:${project.tweed_version}") {
         exclude group: "net.fabricmc.fabric-api"

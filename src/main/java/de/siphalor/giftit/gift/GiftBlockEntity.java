@@ -1,8 +1,9 @@
 package de.siphalor.giftit.gift;
 
 import com.mojang.datafixers.Dynamic;
-import de.siphalor.giftit.Config;
 import de.siphalor.giftit.GiftIt;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -71,15 +72,15 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	}
 
 	@Override
-	public void fromTag(CompoundTag compoundTag) {
-		super.fromTag(compoundTag);
+	public void fromTag(BlockState blockState, CompoundTag compoundTag) {
+		super.fromTag(blockState, compoundTag);
 		wrappedBlockState = new Dynamic<>(NbtOps.INSTANCE, compoundTag.getCompound("WrappedState"));
 
 		if(compoundTag.contains("WrappedData")) {
 			wrappedBlockData = compoundTag.getCompound("WrappedData");
 		}
 		color = compoundTag.getInt("color");
-		if(!Config.unbreakableGiftPaper) {
+		if(!GiftIt.CONFIG.unbreakableGiftPaper) {
 			if(compoundTag.contains("PaperDamage"))
 				paperDamage = compoundTag.getInt("PaperDamage");
 			else
@@ -99,7 +100,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 			compoundTag.put("WrappedData", wrappedBlockData);
 		if(color >= 0)
 			compoundTag.putInt("color", color);
-		if(!Config.unbreakableGiftPaper)
+		if(!GiftIt.CONFIG.unbreakableGiftPaper)
 			compoundTag.putInt("PaperDamage", paperDamage);
 
 		if(hasCustomName())
@@ -107,6 +108,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 		return compoundTag;
 	}
 
+	@Environment(EnvType.CLIENT)
 	@Override
 	public void fromClientTag(CompoundTag tag) {
 		color = tag.getInt("color");

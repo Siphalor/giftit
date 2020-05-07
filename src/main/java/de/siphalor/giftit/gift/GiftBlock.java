@@ -1,8 +1,7 @@
 package de.siphalor.giftit.gift;
 
-import de.siphalor.giftit.Config;
 import de.siphalor.giftit.GiftIt;
-import net.fabricmc.fabric.api.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -29,7 +28,7 @@ import net.minecraft.world.World;
 @SuppressWarnings("deprecation")
 public class GiftBlock extends Block implements BlockEntityProvider {
 	public GiftBlock() {
-		super(FabricBlockSettings.of(Material.WOOL).breakByHand(true).build());
+		super(FabricBlockSettings.of(Material.WOOL).breakByHand(true));
 	}
 
 	@Override
@@ -66,9 +65,9 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 	public void unwrap(World world, BlockPos blockPos, Direction activationDirection, PlayerEntity playerEntity) {
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
 		if(blockEntity instanceof GiftBlockEntity) {
-			if(Config.unbreakableGiftPaper || ((GiftBlockEntity) blockEntity).getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && !playerEntity.isCreative()) {
+			if(GiftIt.CONFIG.unbreakableGiftPaper || ((GiftBlockEntity) blockEntity).getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && !playerEntity.isCreative()) {
 				ItemStack itemStack = new ItemStack(GiftIt.GIFT_PAPER);
-				if(!Config.unbreakableGiftPaper)
+				if(!GiftIt.CONFIG.unbreakableGiftPaper)
 					itemStack.setDamage(((GiftBlockEntity) blockEntity).getPaperDamage() + 1);
 				GiftIt.GIFT_PAPER.setColor(itemStack, ((GiftBlockEntity) blockEntity).color);
 				BlockPos itemPos = blockPos.offset(activationDirection);
@@ -91,7 +90,7 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 					blockData.putInt("x", blockPos.getX());
 					blockData.putInt("y", blockPos.getY());
 					blockData.putInt("z", blockPos.getZ());
-					newBlockEntity.fromTag(blockData);
+					newBlockEntity.fromTag(newBlockState, blockData);
 					newBlockEntity.markDirty();
 				}
 			}

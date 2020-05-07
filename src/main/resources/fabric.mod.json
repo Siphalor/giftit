@@ -25,8 +25,8 @@
 		"client": [
 			"de.siphalor.giftit.client.ClientCore"
 		],
-		"modmenu": [
-			"de.siphalor.giftit.client.ModMenuEntryPoint"
+		"tweed:config": [
+			"de.siphalor.giftit.GiftIt::CONFIG"
 		]
 	},
 	"mixins": [
@@ -34,6 +34,7 @@
 	],
 
 	"depends": {
-		"fabricloader": ">=0.4.0"
+		"fabricloader": ">=0.4.0",
+		"tweed": ">=3.0.0-beta.3"
 	}
 }

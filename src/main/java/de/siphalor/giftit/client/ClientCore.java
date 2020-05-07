@@ -2,6 +2,8 @@ package de.siphalor.giftit.client;
 
 import de.siphalor.giftit.gift.GiftBlockEntity;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,6 +13,7 @@ import net.minecraft.item.Item;
 
 import static de.siphalor.giftit.GiftIt.*;
 
+@Environment(EnvType.CLIENT)
 public class ClientCore implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {

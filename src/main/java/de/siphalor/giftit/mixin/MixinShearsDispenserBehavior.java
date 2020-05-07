@@ -4,6 +4,7 @@ import de.siphalor.giftit.gift.GiftBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.FallibleItemDispenserBehavior;
+import net.minecraft.block.dispenser.ShearsDispenserBehavior;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
@@ -14,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@SuppressWarnings({"WeakerAccess", "MixinSuperClass"})
-@Mixin(targets = "net/minecraft/block/dispenser/DispenserBehavior$13")
+@SuppressWarnings({"WeakerAccess"})
+@Mixin(ShearsDispenserBehavior.class)
 public abstract class MixinShearsDispenserBehavior extends FallibleItemDispenserBehavior {
 	@Inject(method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)
 	public void onDispenseSilently(BlockPointer blockPointer, ItemStack itemStack, CallbackInfoReturnable<ItemStack> callbackInfoReturnable) {
@@ -26,7 +27,7 @@ public abstract class MixinShearsDispenserBehavior extends FallibleItemDispenser
 			Block block = world.getBlockState(frontPos).getBlock();
 			if (block instanceof GiftBlock) {
 				((GiftBlock) block).unwrap(world, frontPos, dispenserDirection.getOpposite(), null);
-				success = true;
+				method_27955(true); // setSuccess(true)
 				if(itemStack.damage(1, world.random, null))
 					itemStack.setCount(0);
 				callbackInfoReturnable.setReturnValue(itemStack);

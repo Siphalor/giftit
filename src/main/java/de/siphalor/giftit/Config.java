@@ -2,30 +2,29 @@ package de.siphalor.giftit;
 
 import de.siphalor.giftit.util.IItem;
 import de.siphalor.tweed.config.ConfigEnvironment;
-import de.siphalor.tweed.config.ConfigFile;
 import de.siphalor.tweed.config.ConfigScope;
-import de.siphalor.tweed.config.TweedRegistry;
+import de.siphalor.tweed.config.annotated.*;
 import de.siphalor.tweed.config.constraints.RangeConstraint;
-import de.siphalor.tweed.config.entry.IntEntry;
 
+@ATweedConfig(scope = ConfigScope.SMALLEST, tailors = "tweed:cloth")
 public class Config {
-	public static final ConfigFile FILE = TweedRegistry.registerConfigFile(GiftIt.MOD_ID).setScope(ConfigScope.SMALLEST);
+	@AConfigEntry(
+			name = "max-paper-damage",
+			environment = ConfigEnvironment.SYNCED,
+			constraints = @AConfigConstraint(value = RangeConstraint.class, param = "-1.."),
+			comment =  "The amount of uses for the gift paper.\n" +
+					"Use 0 for infinite uses.\n" +
+					"1 or infinite uses will change the stack size to 64."
+	)
+	public int maxPaperDamage = 4;
 
-	public static final IntEntry MAX_PAPER_DAMAGE = FILE.register("max-paper-damage", new IntEntry(4))
-		.setEnvironment(ConfigEnvironment.SYNCED)
-		.addConstraint(new RangeConstraint<Integer>().greaterThan(-1))
-		.setComment(
-			"The amount of uses for the gift paper.\n" +
-			"Use 0 for infinite uses.\n" +
-			"1 or infinite uses will change the stack size to 64."
-		)
-		.setReloadListener(value -> {
-			((IItem) GiftIt.GIFT_PAPER).setMaxDamage(value == 0 ? 0 : value - 1);
-			unbreakableGiftPaper = value == 0;
-			((IItem) GiftIt.GIFT_PAPER).setMaxCount(value <= 1 ? 64 : 1);
-		});
-	public static boolean unbreakableGiftPaper = false;
+	@AConfigExclude
+	public boolean unbreakableGiftPaper;
 
-	static void initialize() {
+	@AConfigListener()
+	public void onPaperDamageReload() {
+		((IItem) GiftIt.GIFT_PAPER).setMaxDamage(maxPaperDamage == 0 ? 0 : maxPaperDamage - 1);
+		unbreakableGiftPaper = maxPaperDamage == 0;
+		((IItem) GiftIt.GIFT_PAPER).setMaxCount(maxPaperDamage <= 1 ? 64 : 1);
 	}
 }

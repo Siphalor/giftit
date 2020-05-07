@@ -21,6 +21,8 @@ import net.minecraft.util.registry.Registry;
 public class GiftIt implements ModInitializer {
 	public static final String MOD_ID = "giftit";
 
+	public static final Config CONFIG = new Config();
+
 	public static final Block GIFT_BLOCK = Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "gift"), new GiftBlock());
 	public static final GiftBlockItem GIFT_BLOCK_ITEM = Registry.register(Registry.ITEM, new Identifier(MOD_ID, "gift"), new GiftBlockItem(GIFT_BLOCK));
     public static final BlockEntityType<GiftBlockEntity> GIFT_BLOCK_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "gift"), BlockEntityType.Builder.create(GiftBlockEntity::new, GIFT_BLOCK).build(null));
@@ -37,7 +39,8 @@ public class GiftIt implements ModInitializer {
 		DispenserBlock.registerBehavior(GIFT_PAPER, new FallibleItemDispenserBehavior() {
 			@Override
 			public ItemStack dispenseSilently(BlockPointer blockPointer, ItemStack itemStack) {
-				success = GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING)));
+				// setSuccess
+				method_27955(GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING))));
 				itemStack.decrement(1);
 				return itemStack;
 			}
@@ -46,8 +49,6 @@ public class GiftIt implements ModInitializer {
 	}
 
 	private static SoundEvent registerSound(String name) {
-		Config.initialize();
-
     	Identifier identifier = new Identifier(MOD_ID, name);
     	return Registry.register(Registry.SOUND_EVENT, identifier, new SoundEvent(identifier));
 	}

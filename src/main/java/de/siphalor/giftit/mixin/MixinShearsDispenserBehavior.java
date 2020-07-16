@@ -27,7 +27,7 @@ public abstract class MixinShearsDispenserBehavior extends FallibleItemDispenser
 			Block block = world.getBlockState(frontPos).getBlock();
 			if (block instanceof GiftBlock) {
 				((GiftBlock) block).unwrap(world, frontPos, dispenserDirection.getOpposite(), null);
-				method_27955(true); // setSuccess(true)
+				setSuccess(true);
 				if(itemStack.damage(1, world.random, null))
 					itemStack.setCount(0);
 				callbackInfoReturnable.setReturnValue(itemStack);

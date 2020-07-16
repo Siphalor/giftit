@@ -1,6 +1,5 @@
 package de.siphalor.giftit.gift;
 
-import com.mojang.datafixers.Dynamic;
 import de.siphalor.giftit.GiftIt;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -9,15 +8,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
 
 @SuppressWarnings("WeakerAccess")
 public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntityClientSerializable {
-	protected Dynamic<Tag> wrappedBlockState;
+	protected CompoundTag wrappedBlockState;
 	protected CompoundTag wrappedBlockData;
 	protected int color;
 	protected int paperDamage;
@@ -39,11 +37,11 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	}
 
 	public void setWrappedBlockState(BlockState blockState) {
-		this.wrappedBlockState = BlockState.serialize(NbtOps.INSTANCE, blockState);
+		this.wrappedBlockState = NbtHelper.fromBlockState(blockState);
 	}
 
 	public BlockState getWrappedBlockState() {
-		return BlockState.deserialize(wrappedBlockState);
+		return NbtHelper.toBlockState(wrappedBlockState);
 	}
 
 	public void setWrappedBlockData(CompoundTag wrappedBlockData) {
@@ -74,7 +72,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	@Override
 	public void fromTag(BlockState blockState, CompoundTag compoundTag) {
 		super.fromTag(blockState, compoundTag);
-		wrappedBlockState = new Dynamic<>(NbtOps.INSTANCE, compoundTag.getCompound("WrappedState"));
+		wrappedBlockState = compoundTag.getCompound("WrappedState");
 
 		if(compoundTag.contains("WrappedData")) {
 			wrappedBlockData = compoundTag.getCompound("WrappedData");
@@ -95,7 +93,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	public CompoundTag toTag(CompoundTag compoundTag) {
 		super.toTag(compoundTag);
 
-		compoundTag.put("WrappedState", wrappedBlockState.getValue());
+		compoundTag.put("WrappedState", wrappedBlockState);
 		if(wrappedBlockData != null)
 			compoundTag.put("WrappedData", wrappedBlockData);
 		if(color >= 0)

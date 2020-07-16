@@ -39,9 +39,10 @@ public class GiftIt implements ModInitializer {
 		DispenserBlock.registerBehavior(GIFT_PAPER, new FallibleItemDispenserBehavior() {
 			@Override
 			public ItemStack dispenseSilently(BlockPointer blockPointer, ItemStack itemStack) {
-				// setSuccess
-				method_27955(GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING))));
-				itemStack.decrement(1);
+				setSuccess(GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING))));
+				if (isSuccess()) {
+					itemStack.decrement(1);
+				}
 				return itemStack;
 			}
 		});

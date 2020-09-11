@@ -1,15 +1,15 @@
 package de.siphalor.giftit;
 
+import com.google.common.base.CaseFormat;
 import de.siphalor.giftit.util.IItem;
 import de.siphalor.tweed.config.ConfigEnvironment;
 import de.siphalor.tweed.config.ConfigScope;
 import de.siphalor.tweed.config.annotated.*;
 import de.siphalor.tweed.config.constraints.RangeConstraint;
 
-@ATweedConfig(scope = ConfigScope.SMALLEST, tailors = "tweed:cloth")
+@ATweedConfig(scope = ConfigScope.SMALLEST, environment = ConfigEnvironment.UNIVERSAL, tailors = "tweed:cloth", casing = CaseFormat.LOWER_HYPHEN)
 public class Config {
 	@AConfigEntry(
-			name = "max-paper-damage",
 			environment = ConfigEnvironment.SYNCED,
 			constraints = @AConfigConstraint(value = RangeConstraint.class, param = "-1.."),
 			comment =  "The amount of uses for the gift paper.\n" +
@@ -17,6 +17,9 @@ public class Config {
 					"1 or infinite uses will change the stack size to 64."
 	)
 	public int maxPaperDamage = 4;
+
+	@AConfigEntry
+	public boolean restrictToInventories = false;
 
 	@AConfigExclude
 	public boolean unbreakableGiftPaper;

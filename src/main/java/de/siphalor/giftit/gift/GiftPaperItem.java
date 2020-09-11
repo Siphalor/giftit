@@ -3,6 +3,7 @@ package de.siphalor.giftit.gift;
 import de.siphalor.giftit.GiftIt;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -37,6 +38,11 @@ public class GiftPaperItem extends Item implements DyeableGift {
 		if(blockState.getBlock() == GiftIt.GIFT_BLOCK) return false;
 		CompoundTag data = null;
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
+		if (GiftIt.CONFIG.restrictToInventories) {
+			if (!(blockEntity instanceof Inventory)) {
+				return false;
+			}
+		}
 		if(blockEntity != null) {
 			data = blockEntity.toTag(new CompoundTag());
 		}

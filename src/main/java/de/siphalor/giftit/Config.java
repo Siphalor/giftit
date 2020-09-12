@@ -18,7 +18,9 @@ public class Config {
 	)
 	public int maxPaperDamage = 4;
 
-	@AConfigEntry
+	@AConfigEntry(
+			comment = "Restrict wrapping blocks completely to blocks with inventories"
+	)
 	public boolean restrictToInventories = false;
 
 	@AConfigExclude

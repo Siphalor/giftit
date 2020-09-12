@@ -79,6 +79,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 	}
 
 	public boolean tryWrapEntity(ItemStack itemStack, World world, LivingEntity entity) {
+		if (!GiftIt.CONFIG.enableEntityWrapping) return false;
 		if (GiftIt.NONWRAPPABLE_ENTITIES.contains(entity.getType())) return false;
 
 		Box box = entity.getBoundingBox(entity.getPose());

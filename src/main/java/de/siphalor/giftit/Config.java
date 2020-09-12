@@ -24,6 +24,11 @@ public class Config {
 	public boolean restrictToInventories = false;
 
 	@AConfigEntry(
+			comment = "Enable wrapping entities by clicking on them with gift paper."
+	)
+	public boolean enableEntityWrapping = false;
+
+	@AConfigEntry(
 			comment = "Forbid large entities (> 3x3x3)"
 	)
 	public boolean forbidLargeEntities = true;

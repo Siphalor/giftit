@@ -3,6 +3,8 @@ package de.siphalor.giftit.gift;
 import de.siphalor.giftit.GiftIt;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -78,31 +80,45 @@ public class GiftPaperItem extends Item implements DyeableGift {
 		return true;
 	}
 
-	public boolean tryWrapEntity(ItemStack itemStack, World world, LivingEntity entity) {
+	public boolean tryWrapEntity(ItemStack itemStack, World world, Entity entity) {
 		if (!GiftIt.CONFIG.enableEntityWrapping) return false;
 		if (GiftIt.NONWRAPPABLE_ENTITIES.contains(entity.getType())) return false;
 
-		Box box = entity.getBoundingBox(entity.getPose());
+		Box box = entity.getBoundingBox();
 		if (GiftIt.CONFIG.forbidLargeEntities) {
 			if (box.getXLength() > 1.5 || box.getYLength() > 3.0 || box.getZLength() > 1.5) {
 				return false;
 			}
 		}
 
+		entity.stopRiding();
+		entity.removeAllPassengers();
+
+		GiftBlockEntity blockEntity;
+		if (entity instanceof ItemEntity) {
+			ItemStack stack = ((ItemEntity) entity).getStack();
+			blockEntity = new GiftBlockEntity(stack, itemStack.getDamage(), getColor(itemStack), itemStack.hasCustomName() ? itemStack.getName() : null);
+		} else {
+			blockEntity = new GiftBlockEntity(entity, itemStack.getDamage(), getColor(itemStack), itemStack.hasCustomName() ? itemStack.getName() : null);
+		}
+
+		entity.removed = true;
+
 		BlockPos blockPos = new BlockPos(entity.getX() + box.getXLength() / 2D, entity.getY(), entity.getZ() + box.getZLength() / 2D);
-		if (world.getBlockState(blockPos).getMaterial().isReplaceable()) {
-			entity.stopRiding();
-			entity.removeAllPassengers();
-
-			GiftBlockEntity blockEntity = new GiftBlockEntity(entity, itemStack.getDamage(), getColor(itemStack), itemStack.hasCustomName() ? itemStack.getName() : null);
-			entity.removed = true;
-
+		if (
+				world.getBlockState(blockPos).getMaterial().isReplaceable()
+				&& world.getEntities(entity, new Box(blockPos), e -> e.collides() && !e.isSpectator()).isEmpty()
+		) {
 			world.setBlockState(blockPos, GiftIt.GIFT_BLOCK.getDefaultState());
 			world.setBlockEntity(blockPos, blockEntity);
-
-			world.playSound(null, blockPos, GiftIt.GIFT_WRAP_SOUND, SoundCategory.BLOCKS, 1.0F, 1.0F);
-			return true;
+		} else {
+			ItemStack stack = new ItemStack(GiftIt.GIFT_BLOCK_ITEM);
+			blockEntity.toTag(stack.getOrCreateSubTag("BlockEntityTag"));
+			ItemEntity itemEntity = new ItemEntity(world, entity.getX() + box.getXLength(), entity.getY(), entity.getZ() + box.getZLength(), stack);
+			world.spawnEntity(itemEntity);
 		}
-		return false;
+
+		world.playSound(null, blockPos, GiftIt.GIFT_WRAP_SOUND, SoundCategory.BLOCKS, 1.0F, 1.0F);
+		return true;
 	}
 }

@@ -23,6 +23,11 @@ public class Config {
 	)
 	public boolean restrictToInventories = false;
 
+	@AConfigEntry(
+			comment = "Forbid large entities (> 3x3x3)"
+	)
+	public boolean forbidLargeEntities = true;
+
 	@AConfigExclude
 	public boolean unbreakableGiftPaper;
 

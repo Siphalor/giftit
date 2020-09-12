@@ -8,27 +8,44 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
+import net.minecraft.world.World;
 
 @SuppressWarnings("WeakerAccess")
 public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntityClientSerializable {
+	protected GiftWrappedType wrappedType;
 	protected CompoundTag wrappedBlockState;
-	protected CompoundTag wrappedBlockData;
+	protected CompoundTag wrappedData;
 	protected int color;
 	protected int paperDamage;
 
 	protected Text customName;
 
 	public GiftBlockEntity(BlockState blockState, CompoundTag blockData, int paperDamage, int color, Text customName) {
+		this(paperDamage, color, customName);
+        setWrappedBlockState(blockState, blockData);
+	}
+
+	public GiftBlockEntity(ItemStack itemStack, int paperDamage, int color, Text customName) {
+		this(paperDamage, color, customName);
+		setWrappedStack(itemStack);
+	}
+
+	public GiftBlockEntity(Entity entity, int paperDamage, int color, Text customName) {
+		this(paperDamage, color, customName);
+		setWrappedEntity(entity);
+	}
+
+	protected GiftBlockEntity(int paperDamage, int color, Text customName) {
 		super(GiftIt.GIFT_BLOCK_ENTITY_TYPE);
-        setWrappedBlockState(blockState);
-		wrappedBlockData = blockData;
 		this.paperDamage = paperDamage;
 		this.color = color;
-
 		this.customName = customName;
 	}
 
@@ -36,16 +53,41 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 		this(Blocks.AIR.getDefaultState(), null, 0, -1, null);
 	}
 
-	public void setWrappedBlockState(BlockState blockState) {
-		this.wrappedBlockState = NbtHelper.fromBlockState(blockState);
+	public GiftWrappedType getWrappedType() {
+		return wrappedType;
+	}
+
+	public void setWrappedBlockState(BlockState blockState, CompoundTag blockData) {
+		wrappedType = GiftWrappedType.BLOCK;
+		wrappedBlockState = NbtHelper.fromBlockState(blockState);
+		wrappedData = blockData;
 	}
 
 	public BlockState getWrappedBlockState() {
 		return NbtHelper.toBlockState(wrappedBlockState);
 	}
 
-	public void setWrappedBlockData(CompoundTag wrappedBlockData) {
-		this.wrappedBlockData = wrappedBlockData;
+	public void setWrappedStack(ItemStack stack) {
+		wrappedType = GiftWrappedType.STACK;
+		wrappedData = stack.toTag(new CompoundTag());
+	}
+
+	public ItemStack getWrappedStack() {
+		return ItemStack.fromTag(wrappedData);
+	}
+
+	public void setWrappedEntity(Entity entity) {
+		wrappedType = GiftWrappedType.ENTITY;
+		wrappedData = new CompoundTag();
+		entity.saveToTag(wrappedData);
+	}
+
+	public Entity getWrappedEntity(World world) {
+		return EntityType.getEntityFromTag(wrappedData, world).orElse(null);
+	}
+
+	public CompoundTag getWrappedData() {
+		return wrappedData;
 	}
 
 	public int getColor() {
@@ -71,12 +113,41 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 
 	@Override
 	public void fromTag(BlockState blockState, CompoundTag compoundTag) {
-		super.fromTag(blockState, compoundTag);
-		wrappedBlockState = compoundTag.getCompound("WrappedState");
-
-		if(compoundTag.contains("WrappedData")) {
-			wrappedBlockData = compoundTag.getCompound("WrappedData");
+	super.fromTag(blockState, compoundTag);
+		if (compoundTag.contains("WrappedType", 3)) {
+			int type = compoundTag.getInt("WrappedType");
+			GiftWrappedType[] wrappedTypes = GiftWrappedType.values();
+			if (type >= 0 && type < wrappedTypes.length) {
+				wrappedType = wrappedTypes[type];
+			} else {
+				wrappedType = GiftWrappedType.BLOCK;
+			}
+		} else {
+			wrappedType = GiftWrappedType.BLOCK;
 		}
+
+		switch (wrappedType) {
+			default:
+			case BLOCK:
+				if (compoundTag.contains("WrappedState", 10)) {
+					wrappedBlockState = compoundTag.getCompound("WrappedState");
+					if (compoundTag.contains("WrappedData", 10)) {
+						wrappedData = compoundTag.getCompound("WrappedData");
+					}
+				} else {
+					setWrappedBlockState(Blocks.AIR.getDefaultState(), null);
+				}
+				break;
+			case STACK:
+			case ENTITY:
+				if (compoundTag.contains("WrappedData", 10)) {
+					wrappedData = compoundTag.getCompound("WrappedData");
+				} else {
+					setWrappedStack(ItemStack.EMPTY);
+				}
+				break;
+		}
+
 		color = compoundTag.getInt("color");
 		if(!GiftIt.CONFIG.unbreakableGiftPaper) {
 			if(compoundTag.contains("PaperDamage"))
@@ -93,16 +164,30 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	public CompoundTag toTag(CompoundTag compoundTag) {
 		super.toTag(compoundTag);
 
-		compoundTag.put("WrappedState", wrappedBlockState);
-		if(wrappedBlockData != null)
-			compoundTag.put("WrappedData", wrappedBlockData);
-		if(color >= 0)
-			compoundTag.putInt("color", color);
-		if(!GiftIt.CONFIG.unbreakableGiftPaper)
-			compoundTag.putInt("PaperDamage", paperDamage);
+		compoundTag.putInt("WrappedType", wrappedType.ordinal());
+		switch (wrappedType) {
+			case BLOCK:
+				compoundTag.put("WrappedState", wrappedBlockState);
+				if (wrappedData != null) {
+					compoundTag.put("WrappedData", wrappedData);
+				}
+				break;
+			case STACK:
+			case ENTITY:
+				compoundTag.put("WrappedData", wrappedData);
+				break;
+		}
 
-		if(hasCustomName())
+		if(color >= 0) {
+			compoundTag.putInt("color", color);
+		}
+		if(!GiftIt.CONFIG.unbreakableGiftPaper) {
+			compoundTag.putInt("PaperDamage", paperDamage);
+		}
+
+		if(hasCustomName()) {
 			compoundTag.putString("CustomName", Text.Serializer.toJson(customName));
+		}
 		return compoundTag;
 	}
 

@@ -4,6 +4,7 @@ import de.siphalor.giftit.gift.GiftBlock;
 import de.siphalor.giftit.gift.GiftBlockEntity;
 import de.siphalor.giftit.gift.GiftBlockItem;
 import de.siphalor.giftit.gift.GiftPaperItem;
+import de.siphalor.giftit.recipe.StackWrappingRecipe;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.Block;
@@ -11,7 +12,10 @@ import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
 import net.minecraft.block.dispenser.FallibleItemDispenserBehavior;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
@@ -33,6 +37,9 @@ public class GiftIt implements ModInitializer {
     public static final SoundEvent GIFT_UNWRAP_SOUND = registerSound("gift.unwrap");
 
     public static final Tag<Block> NONWRAPPABLE_BLOCKS = TagRegistry.block(new Identifier(MOD_ID, "nonwrappable"));
+    public static final Tag<EntityType<?>> NONWRAPPABLE_ENTITIES = TagRegistry.entityType(new Identifier(MOD_ID, "nonwrappable"));
+
+    public static final RecipeSerializer<StackWrappingRecipe> STACK_WRAPPING_RECIPE_SERIALIZER = Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MOD_ID, "stack_wrapping"), new SpecialRecipeSerializer<>(StackWrappingRecipe::new));
 
 	@Override
 	public void onInitialize() {

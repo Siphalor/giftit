@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.piston.PistonBehavior;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,6 +23,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
@@ -33,9 +35,9 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 
 	@Override
 	public void onPlaced(World world, BlockPos blockPos, BlockState blockState, LivingEntity livingEntity, ItemStack itemStack) {
-		if(itemStack.hasCustomName()) {
+		if (itemStack.hasCustomName()) {
 			BlockEntity blockEntity = world.getBlockEntity(blockPos);
-			if(blockEntity instanceof GiftBlockEntity) {
+			if (blockEntity instanceof GiftBlockEntity) {
 				((GiftBlockEntity) blockEntity).setCustomName(itemStack.getName());
 			}
 		}
@@ -45,7 +47,7 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if(!world.isClient()) {
+		if (!world.isClient()) {
 			unwrap(world, pos, hit.getSide(), player);
 		}
 
@@ -64,40 +66,72 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 
 	public void unwrap(World world, BlockPos blockPos, Direction activationDirection, PlayerEntity playerEntity) {
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
-		if(blockEntity instanceof GiftBlockEntity) {
-			if(GiftIt.CONFIG.unbreakableGiftPaper || ((GiftBlockEntity) blockEntity).getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && !playerEntity.isCreative()) {
+		if (blockEntity instanceof GiftBlockEntity) {
+			GiftBlockEntity giftBlockEntity = (GiftBlockEntity) blockEntity;
+			if (GiftIt.CONFIG.unbreakableGiftPaper || giftBlockEntity.getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && !playerEntity.isCreative()) {
 				ItemStack itemStack = new ItemStack(GiftIt.GIFT_PAPER);
-				if(!GiftIt.CONFIG.unbreakableGiftPaper)
-					itemStack.setDamage(((GiftBlockEntity) blockEntity).getPaperDamage() + 1);
-				GiftIt.GIFT_PAPER.setColor(itemStack, ((GiftBlockEntity) blockEntity).color);
+				if (!GiftIt.CONFIG.unbreakableGiftPaper)
+					itemStack.setDamage(giftBlockEntity.getPaperDamage() + 1);
+				GiftIt.GIFT_PAPER.setColor(itemStack, giftBlockEntity.color);
 				BlockPos itemPos = blockPos.offset(activationDirection);
 				ItemEntity itemEntity = new ItemEntity(world, itemPos.getX(), itemPos.getY(), itemPos.getZ(), itemStack);
 				world.spawnEntity(itemEntity);
 			}
 
-			if(playerEntity instanceof ServerPlayerEntity && ((GiftBlockEntity) blockEntity).hasCustomName()) {
-				((ServerPlayerEntity) playerEntity).networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, ((GiftBlockEntity) blockEntity).getCustomName()));
+			if (playerEntity instanceof ServerPlayerEntity && giftBlockEntity.hasCustomName()) {
+				((ServerPlayerEntity) playerEntity).networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, giftBlockEntity.getCustomName()));
 			}
 
-			CompoundTag blockData = ((GiftBlockEntity) blockEntity).wrappedBlockData;
-			BlockState newBlockState = ((GiftBlockEntity) blockEntity).getWrappedBlockState();
-			Clearable.clear(blockEntity);
+			switch (giftBlockEntity.getWrappedType()) {
+				default:
+				case BLOCK: {
+					CompoundTag blockData = giftBlockEntity.getWrappedData();
+					BlockState newBlockState = giftBlockEntity.getWrappedBlockState();
+					Clearable.clear(blockEntity);
 
-			world.setBlockState(blockPos, newBlockState, 2);
-			if(blockData != null) {
-				BlockEntity newBlockEntity = world.getBlockEntity(blockPos);
-				if(newBlockEntity != null) {
-					blockData.putInt("x", blockPos.getX());
-					blockData.putInt("y", blockPos.getY());
-					blockData.putInt("z", blockPos.getZ());
-					newBlockEntity.fromTag(newBlockState, blockData);
-					newBlockEntity.markDirty();
+					world.setBlockState(blockPos, newBlockState, 2);
+					if (blockData != null) {
+						BlockEntity newBlockEntity = world.getBlockEntity(blockPos);
+						if (newBlockEntity != null) {
+							blockData.putInt("x", blockPos.getX());
+							blockData.putInt("y", blockPos.getY());
+							blockData.putInt("z", blockPos.getZ());
+							newBlockEntity.fromTag(newBlockState, blockData);
+							newBlockEntity.markDirty();
+						}
+					}
+
+					for (Direction direction : Direction.values()) {
+						BlockPos pos = blockPos.offset(direction);
+						newBlockState = world.getBlockState(blockPos);
+						world.setBlockState(blockPos, newBlockState.getBlock().getStateForNeighborUpdate(newBlockState, direction, world.getBlockState(pos), world, blockPos, pos));
+					}
 				}
-			}
-			for(Direction direction : Direction.values()) {
-				BlockPos pos = blockPos.offset(direction);
-				newBlockState = world.getBlockState(blockPos);
-				world.setBlockState(blockPos, newBlockState.getBlock().getStateForNeighborUpdate(newBlockState, direction, world.getBlockState(pos), world, blockPos, pos));
+				break;
+				case STACK: {
+					ItemStack stack = giftBlockEntity.getWrappedStack();
+					Clearable.clear(blockEntity);
+
+					world.removeBlock(blockPos, false);
+
+					ItemEntity itemEntity = new ItemEntity(world, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, stack);
+					world.spawnEntity(itemEntity);
+				}
+				break;
+				case ENTITY: {
+					Entity entity = giftBlockEntity.getWrappedEntity(world);
+					Clearable.clear(blockEntity);
+
+					world.removeBlock(blockPos, false);
+
+					if (entity != null) {
+						entity.setVelocity(Vec3d.ZERO);
+						entity.setOnGround(false);
+						entity.refreshPositionAndAngles(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, entity.yaw, entity.pitch);
+						world.spawnEntity(entity);
+					}
+				}
+				break;
 			}
 
 			world.playSound(null, blockPos, GiftIt.GIFT_UNWRAP_SOUND, SoundCategory.BLOCKS, 1.0F, 1.0F);

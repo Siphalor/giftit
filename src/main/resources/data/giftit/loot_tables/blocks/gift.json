@@ -13,6 +13,11 @@
 							"source": "block_entity",
 							"ops": [
 								{
+									"source": "WrappedType",
+									"target": "BlockEntityTag.WrappedType",
+									"op": "replace"
+								},
+								{
 									"source": "WrappedState",
 									"target": "BlockEntityTag.WrappedState",
 									"op": "replace"

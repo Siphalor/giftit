@@ -56,6 +56,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 	public boolean tryWrapBlock(ItemStack itemStack, World world, BlockPos blockPos) {
 		BlockState blockState = world.getBlockState(blockPos);
 		if (GiftIt.NONWRAPPABLE_BLOCKS.contains(blockState.getBlock())) return false;
+		if (blockState.isAir()) return false;
 		if (blockState.getBlock() == GiftIt.GIFT_BLOCK) return false;
 
 		CompoundTag data = null;

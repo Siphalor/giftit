@@ -6,5 +6,7 @@
 	"tweed.cloth.giftit": "Gift It! Configuration",
 	"tweed.cloth.giftit.main": "General",
 	"tweed.cloth.giftit.main.max-paper-damage": "Gift Paper Uses",
-	"tweed.cloth.giftit.main.restrict-to-inventories": "Restrict to Inventories"
+	"tweed.cloth.giftit.main.restrict-to-inventories": "Restrict to Inventories",
+	"tweed.cloth.giftit.main.enable-entity-wrapping": "Enable Entity Wrapping",
+	"tweed.cloth.giftit.main.forbid-large-entities": "Forbid Wrapping Large Entities"
 }

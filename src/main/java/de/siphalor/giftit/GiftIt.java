@@ -12,15 +12,25 @@ import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
 import net.minecraft.block.dispenser.FallibleItemDispenserBehavior;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPointer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+
+import java.util.List;
 
 public class GiftIt implements ModInitializer {
 	public static final String MOD_ID = "giftit";
@@ -46,11 +56,43 @@ public class GiftIt implements ModInitializer {
 		DispenserBlock.registerBehavior(GIFT_PAPER, new FallibleItemDispenserBehavior() {
 			@Override
 			public ItemStack dispenseSilently(BlockPointer blockPointer, ItemStack itemStack) {
-				setSuccess(GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING))));
-				if (isSuccess()) {
-					itemStack.decrement(1);
+				if (!blockPointer.getWorld().isClient()) {
+					BlockPos targetPos = blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING));
+					setSuccess(
+							GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), targetPos)
+									|| tryWrapEntity(blockPointer, itemStack, targetPos)
+					);
+					if (isSuccess()) {
+						itemStack.decrement(1);
+						blockPointer.getWorld().playSound(null, blockPointer.getBlockPos(), GIFT_WRAP_SOUND, SoundCategory.BLOCKS, 1.0F, 1.0F);
+					}
 				}
 				return itemStack;
+			}
+
+			public boolean tryWrapEntity(BlockPointer blockPointer, ItemStack itemStack, BlockPos targetPos) {
+				if (blockPointer.getWorld().getBlockState(targetPos).isAir()) {
+					List<Entity> entities = blockPointer.getWorld().getEntities(Entity.class, new Box(targetPos), EntityPredicates.VALID_ENTITY);
+					for (Entity entity : entities) {
+						if (entity instanceof LivingEntity) {
+							if (GIFT_PAPER.tryWrapEntity(itemStack, blockPointer.getWorld(), (LivingEntity) entity)) {
+								return true;
+							}
+						}
+						if (entity instanceof ItemEntity) {
+							World world = blockPointer.getWorld();
+							entity.stopRiding();
+							entity.removeAllPassengers();
+							entity.removed = true;
+							ItemStack stack = ((ItemEntity) entity).getStack();
+
+							world.setBlockState(targetPos, GIFT_BLOCK.getDefaultState());
+							world.setBlockEntity(targetPos, new GiftBlockEntity(stack, itemStack.getDamage(), GIFT_PAPER.getColor(itemStack), itemStack.hasCustomName() ? itemStack.getName() : null));
+							return true;
+						}
+					}
+				}
+				return false;
 			}
 		});
 		DispenserBlock.registerBehavior(GIFT_BLOCK_ITEM, new BlockPlacementDispenserBehavior());

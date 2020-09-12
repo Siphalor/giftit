@@ -29,7 +29,7 @@ public class Config {
 	public boolean enableEntityWrapping = false;
 
 	@AConfigEntry(
-			comment = "Forbid large entities (> 3x3x3)"
+			comment = "Forbid large entities (> 1.5x3x1.5)"
 	)
 	public boolean forbidLargeEntities = true;
 

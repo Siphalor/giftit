@@ -81,6 +81,7 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 					BlockState newBlockState = giftBlockEntity.getWrappedBlockState();
 					Clearable.clear(blockEntity);
 
+					world.removeBlock(blockPos, false);
 					world.setBlockState(blockPos, newBlockState, 2);
 					if (blockData != null) {
 						BlockEntity newBlockEntity = world.getBlockEntity(blockPos);

@@ -14,7 +14,6 @@
 		"minecraft:structure_block",
 		"#minecraft:beds",
 		"#minecraft:doors",
-		"#minecraft:crops",
-		"giftit:gift"
+		"#minecraft:crops"
 	]
 }

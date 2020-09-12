@@ -3,6 +3,7 @@ package de.siphalor.giftit.recipe;
 import de.siphalor.giftit.GiftIt;
 import de.siphalor.giftit.gift.GiftWrappedType;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.RecipeSerializer;
@@ -26,11 +27,13 @@ public class StackWrappingRecipe extends SpecialCraftingRecipe {
 				paper = true;
 				continue;
 			}
-			if (!other && stack.getItem() != GiftIt.GIFT_PAPER) {
-				other = true;
-				continue;
+			if (!other && stack.getItem() != GiftIt.GIFT_PAPER && !(stack.getItem() instanceof DyeItem)) {
+				if (GiftIt.CONFIG.allowGiftRecursion || stack.getItem() != GiftIt.GIFT_BLOCK_ITEM) {
+					other = true;
+					continue;
+				}
 			}
-			if (paper && other)
+			if (paper || other)
 				return false;
 		}
 		return paper && other;
@@ -49,11 +52,13 @@ public class StackWrappingRecipe extends SpecialCraftingRecipe {
 				paperStack = stack;
 				continue;
 			}
-			if (otherStack == null && stack.getItem() != GiftIt.GIFT_PAPER) {
-				otherStack = stack;
-				continue;
+			if (otherStack == null && stack.getItem() != GiftIt.GIFT_PAPER && !(stack.getItem() instanceof DyeItem)) {
+				if (GiftIt.CONFIG.allowGiftRecursion || stack.getItem() != GiftIt.GIFT_BLOCK_ITEM) {
+					otherStack = stack;
+					continue;
+				}
 			}
-			if (paperStack != null && otherStack != null) {
+			if (paperStack != null || otherStack != null) {
 				return ItemStack.EMPTY;
 			}
 		}

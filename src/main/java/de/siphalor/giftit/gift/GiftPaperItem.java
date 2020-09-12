@@ -59,7 +59,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 		BlockState blockState = world.getBlockState(blockPos);
 		if (GiftIt.NONWRAPPABLE_BLOCKS.contains(blockState.getBlock())) return false;
 		if (blockState.isAir()) return false;
-		if (blockState.getBlock() == GiftIt.GIFT_BLOCK) return false;
+		if (!GiftIt.CONFIG.allowGiftRecursion && blockState.getBlock() == GiftIt.GIFT_BLOCK) return false;
 
 		CompoundTag data = null;
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
@@ -73,6 +73,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 			data = blockEntity.toTag(new CompoundTag());
 		}
 		Clearable.clear(blockEntity);
+		world.removeBlock(blockPos, false);
 		world.setBlockState(blockPos, GiftIt.GIFT_BLOCK.getDefaultState());
 		world.setBlockEntity(blockPos, new GiftBlockEntity(blockState, data, itemStack.getDamage(), getColor(itemStack), itemStack.hasCustomName() ? itemStack.getName() : null));
 

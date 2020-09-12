@@ -24,6 +24,11 @@ public class Config {
 	public boolean restrictToInventories = false;
 
 	@AConfigEntry(
+			comment = "Allow gift recursion (packing gifts into gifts)."
+	)
+	public boolean allowGiftRecursion = true;
+
+	@AConfigEntry(
 			comment = "Enable wrapping entities by clicking on them with gift paper."
 	)
 	public boolean enableEntityWrapping = false;

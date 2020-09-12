@@ -68,20 +68,12 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
 		if (blockEntity instanceof GiftBlockEntity) {
 			GiftBlockEntity giftBlockEntity = (GiftBlockEntity) blockEntity;
-			if (GiftIt.CONFIG.unbreakableGiftPaper || giftBlockEntity.getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && !playerEntity.isCreative()) {
-				ItemStack itemStack = new ItemStack(GiftIt.GIFT_PAPER);
-				if (!GiftIt.CONFIG.unbreakableGiftPaper)
-					itemStack.setDamage(giftBlockEntity.getPaperDamage() + 1);
-				GiftIt.GIFT_PAPER.setColor(itemStack, giftBlockEntity.color);
-				BlockPos itemPos = blockPos.offset(activationDirection);
-				ItemEntity itemEntity = new ItemEntity(world, itemPos.getX(), itemPos.getY(), itemPos.getZ(), itemStack);
-				world.spawnEntity(itemEntity);
-			}
 
 			if (playerEntity instanceof ServerPlayerEntity && giftBlockEntity.hasCustomName()) {
 				((ServerPlayerEntity) playerEntity).networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, giftBlockEntity.getCustomName()));
 			}
 
+			boolean dropAround = false;
 			switch (giftBlockEntity.getWrappedType()) {
 				default:
 				case BLOCK: {
@@ -106,6 +98,7 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 						newBlockState = world.getBlockState(blockPos);
 						world.setBlockState(blockPos, newBlockState.getBlock().getStateForNeighborUpdate(newBlockState, direction, world.getBlockState(pos), world, blockPos, pos));
 					}
+					dropAround = newBlockState.isFullCube(world, blockPos);
 				}
 				break;
 				case STACK: {
@@ -134,7 +127,30 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 				break;
 			}
 
+			if (GiftIt.CONFIG.unbreakableGiftPaper || giftBlockEntity.getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && (playerEntity == null || !playerEntity.isCreative())) {
+				ItemStack itemStack = new ItemStack(GiftIt.GIFT_PAPER);
+				if (!GiftIt.CONFIG.unbreakableGiftPaper)
+					itemStack.setDamage(giftBlockEntity.getPaperDamage() + 1);
+				GiftIt.GIFT_PAPER.setColor(itemStack, giftBlockEntity.color);
+				BlockPos.Mutable itemPos = blockPos.mutableCopy();
+				if (dropAround) {
+					itemPos.move(0, 1, 0);
+					if (isFullCube(world.getBlockState(itemPos), world, itemPos)) {
+						itemPos.move(0, -2, 0);
+						if (isFullCube(world.getBlockState(itemPos), world, itemPos)) {
+							itemPos.move(0, 1, 0);
+						}
+					}
+				}
+				ItemEntity itemEntity = new ItemEntity(world, itemPos.getX() + 0.5, itemPos.getY(), itemPos.getZ() + 0.5, itemStack);
+				world.spawnEntity(itemEntity);
+			}
+
 			world.playSound(null, blockPos, GiftIt.GIFT_UNWRAP_SOUND, SoundCategory.BLOCKS, 1.0F, 1.0F);
 		}
+	}
+
+	private boolean isFullCube(BlockState blockState, World world, BlockPos blockPos) {
+		return blockState.isFullCube(world, blockPos);
 	}
 }

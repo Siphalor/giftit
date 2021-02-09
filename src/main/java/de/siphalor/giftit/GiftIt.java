@@ -72,10 +72,10 @@ public class GiftIt implements ModInitializer {
 
 			public boolean tryWrapEntity(BlockPointer blockPointer, ItemStack itemStack, BlockPos targetPos) {
 				if (blockPointer.getWorld().getBlockState(targetPos).isAir()) {
-					List<Entity> entities = blockPointer.getWorld().getEntities(Entity.class, new Box(targetPos), EntityPredicates.VALID_ENTITY);
+					List<Entity> entities = blockPointer.getWorld().getEntitiesByClass(Entity.class, new Box(targetPos), EntityPredicates.VALID_ENTITY);
 					for (Entity entity : entities) {
 						if (CONFIG.enableEntityWrapping && entity instanceof LivingEntity) {
-							if (GIFT_PAPER.tryWrapEntity(itemStack, blockPointer.getWorld(), (LivingEntity) entity)) {
+							if (GIFT_PAPER.tryWrapEntity(itemStack, blockPointer.getWorld(), entity)) {
 								return true;
 							}
 						}

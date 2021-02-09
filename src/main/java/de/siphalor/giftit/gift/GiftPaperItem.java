@@ -109,7 +109,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 		BlockPos blockPos = new BlockPos(entity.getX() + box.getXLength() / 2D, entity.getY(), entity.getZ() + box.getZLength() / 2D);
 		if (
 				world.getBlockState(blockPos).getMaterial().isReplaceable()
-				&& world.getEntities(entity, new Box(blockPos), e -> e.collides() && !e.isSpectator()).isEmpty()
+				&& world.getOtherEntities(entity, new Box(blockPos), e -> e.collides() && !e.isSpectator()).isEmpty()
 		) {
 			world.setBlockState(blockPos, GiftIt.GIFT_BLOCK.getDefaultState());
 			world.setBlockEntity(blockPos, blockEntity);

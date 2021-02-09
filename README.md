@@ -9,4 +9,4 @@ A Minecraft mod deprecating duct tape in favor of nice gifts.
 
 ## License
 
-This mod is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+This mod is available under the MIT License. This means you can do almost anything with this mod, but you must attribute me and can't hold me liable.

@@ -14,7 +14,7 @@
 		"issues": "https://github.com/Siphalor/giftit/issues"
 	},
 
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/giftit/icon.png",
 
 	"environment": "*",

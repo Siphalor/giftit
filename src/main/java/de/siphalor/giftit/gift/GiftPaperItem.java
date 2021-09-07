@@ -21,6 +21,7 @@ import net.minecraft.util.Clearable;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class GiftPaperItem extends Item implements DyeableGift {
@@ -59,6 +60,11 @@ public class GiftPaperItem extends Item implements DyeableGift {
 	public boolean tryWrapBlock(ItemStack itemStack, World world, BlockPos blockPos) {
 		BlockState blockState = world.getBlockState(blockPos);
 		if (GiftIt.NONWRAPPABLE_BLOCKS.contains(blockState.getBlock())) return false;
+		if (!Config.forbiddenBlocks.isEmpty()) {
+			if (Config.forbiddenBlocks.contains(Registry.BLOCK.getId(blockState.getBlock()).toString())) {
+				return false;
+			}
+		}
 		if (blockState.isAir()) return false;
 		if (!Config.allowGiftRecursion && blockState.getBlock() == GiftIt.GIFT_BLOCK) return false;
 
@@ -91,6 +97,11 @@ public class GiftPaperItem extends Item implements DyeableGift {
 	public boolean tryWrapEntity(ItemStack itemStack, World world, Entity entity) {
 		if (!Config.enableEntityWrapping) return false;
 		if (GiftIt.NONWRAPPABLE_ENTITIES.contains(entity.getType())) return false;
+		if (!Config.forbiddenEntities.isEmpty()) {
+			if (Config.forbiddenEntities.contains(Registry.ENTITY_TYPE.getId(entity.getType()).toString())) {
+				return false;
+			}
+		}
 		if (entity instanceof PlayerEntity) return false;
 
 		Box box = entity.getBoundingBox();

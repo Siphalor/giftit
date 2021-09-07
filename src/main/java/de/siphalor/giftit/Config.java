@@ -7,6 +7,9 @@ import de.siphalor.tweed4.config.ConfigEnvironment;
 import de.siphalor.tweed4.config.ConfigScope;
 import de.siphalor.tweed4.config.constraints.RangeConstraint;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ATweedConfig(scope = ConfigScope.SMALLEST, environment = ConfigEnvironment.UNIVERSAL, tailors = "tweed4:coat", casing = CaseFormat.LOWER_HYPHEN)
 public class Config {
 	@AConfigEntry(
@@ -25,6 +28,12 @@ public class Config {
 	public static boolean restrictToInventories = false;
 
 	@AConfigEntry(
+			comment = "Disallow certain blocks from being wrapped.\n" +
+					          "This can be used additionally to the block tag \"giftit:nonwrappable\"."
+	)
+	public static List<String> forbiddenBlocks = new ArrayList<>();
+
+	@AConfigEntry(
 			comment = "Allow gift recursion (packing gifts into gifts)."
 	)
 	public static boolean allowGiftRecursion = true;
@@ -38,6 +47,12 @@ public class Config {
 			comment = "Forbid large entities (> 1.5x3x1.5)"
 	)
 	public static boolean forbidLargeEntities = true;
+
+	@AConfigEntry(
+			comment = "Disallow certain entities from being wrapped.\n" +
+					          "This can be used additionally to the entity tag \"giftit:nonwrappable\"."
+	)
+	public static List<String> forbiddenEntities = new ArrayList<>();
 
 	@AConfigExclude
 	public static boolean unbreakableGiftPaper;

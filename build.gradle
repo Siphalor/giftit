@@ -133,17 +133,13 @@ if (project.hasProperty("siphalorCurseForgeApi")) {
 	curseforge {
 		apiKey project.siphalorCurseForgeApi
 		project {
-			id = "314633"
+			id = "323210"
 			releaseType = project.mod_release
 			changelogType = "markdown"
 			changelog = getChangelog()
 			addGameVersion("Fabric")
 			for (version in ((String) project.mod_mc_versions).split(";")) {
 				addGameVersion(version)
-			}
-			relations {
-				embeddedLibrary "fabric-api"
-				optionalDependency "roughly-enough-items"
 			}
 			mainArtifact(remapJar) {
 				displayName = "[${project.mod_mc_version_specifier}] ${project.mod_version}"
@@ -160,7 +156,7 @@ if (project.hasProperty("siphalorModrinthApi")) {
 		dependsOn(build)
 
 		token = project.siphalorModrinthApi
-		projectId = "18ztUZP5"
+		projectId = "oUy3C3HW"
 		versionNumber = version
 		versionName = "[${project.mod_mc_version_specifier}] ${project.mod_version}"
 		changelog = getChangelog()

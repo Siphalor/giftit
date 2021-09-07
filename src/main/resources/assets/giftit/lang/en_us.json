@@ -3,11 +3,12 @@
 	"item.giftit.gift": "Gift",
 	"block.giftit.gift": "Gift",
 
-	"tweed.cloth.giftit": "Gift It! Configuration",
-	"tweed.cloth.giftit.main": "General",
-	"tweed.cloth.giftit.main.max-paper-damage": "Gift Paper Uses",
-	"tweed.cloth.giftit.main.restrict-to-inventories": "Restrict to Inventories",
-	"tweed.cloth.giftit.main.allow-gift-recursion": "Allow Gift Recursion",
-	"tweed.cloth.giftit.main.enable-entity-wrapping": "Enable Entity Wrapping",
-	"tweed.cloth.giftit.main.forbid-large-entities": "Forbid Wrapping Large Entities"
+	"tweed4_tailor_screen.screen.giftit": "Gift It! Configuration",
+	"tweed4_tailor_screen.screen.giftit.max-paper-damage": "Gift Paper Uses",
+	"tweed4_tailor_screen.screen.giftit.restrict-to-inventories": "Restrict to Inventories",
+	"tweed4_tailor_screen.screen.giftit.forbidden-blocks": "Forbidden Blocks",
+	"tweed4_tailor_screen.screen.giftit.allow-gift-recursion": "Allow Gift Recursion",
+	"tweed4_tailor_screen.screen.giftit.enable-entity-wrapping": "Enable Entity Wrapping",
+	"tweed4_tailor_screen.screen.giftit.forbid-large-entities": "Forbid Wrapping Large Entities",
+	"tweed4_tailor_screen.screen.giftit.forbidden-entities": "Forbidden Entities"
 }

@@ -23,7 +23,7 @@ public abstract class MixinShearsDispenserBehavior extends FallibleItemDispenser
 		World world = blockPointer.getWorld();
 		if(!world.isClient()) {
 			Direction dispenserDirection = blockPointer.getBlockState().get(DispenserBlock.FACING);
-			BlockPos frontPos = blockPointer.getBlockPos().offset(dispenserDirection);
+			BlockPos frontPos = blockPointer.getPos().offset(dispenserDirection);
 			Block block = world.getBlockState(frontPos).getBlock();
 			if (block instanceof GiftBlock) {
 				((GiftBlock) block).unwrap(world, frontPos, dispenserDirection.getOpposite(), null);

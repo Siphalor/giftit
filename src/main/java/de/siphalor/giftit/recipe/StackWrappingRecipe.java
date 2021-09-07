@@ -1,11 +1,12 @@
 package de.siphalor.giftit.recipe;
 
+import de.siphalor.giftit.Config;
 import de.siphalor.giftit.GiftIt;
 import de.siphalor.giftit.gift.GiftWrappedType;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.util.Identifier;
@@ -28,7 +29,7 @@ public class StackWrappingRecipe extends SpecialCraftingRecipe {
 				continue;
 			}
 			if (!other && stack.getItem() != GiftIt.GIFT_PAPER && !(stack.getItem() instanceof DyeItem)) {
-				if (GiftIt.CONFIG.allowGiftRecursion || stack.getItem() != GiftIt.GIFT_BLOCK_ITEM) {
+				if (Config.allowGiftRecursion || stack.getItem() != GiftIt.GIFT_BLOCK_ITEM) {
 					other = true;
 					continue;
 				}
@@ -53,7 +54,7 @@ public class StackWrappingRecipe extends SpecialCraftingRecipe {
 				continue;
 			}
 			if (otherStack == null && stack.getItem() != GiftIt.GIFT_PAPER && !(stack.getItem() instanceof DyeItem)) {
-				if (GiftIt.CONFIG.allowGiftRecursion || stack.getItem() != GiftIt.GIFT_BLOCK_ITEM) {
+				if (Config.allowGiftRecursion || stack.getItem() != GiftIt.GIFT_BLOCK_ITEM) {
 					otherStack = stack;
 					continue;
 				}
@@ -68,10 +69,10 @@ public class StackWrappingRecipe extends SpecialCraftingRecipe {
 
 		ItemStack result = new ItemStack(GiftIt.GIFT_BLOCK_ITEM);
 		GiftIt.GIFT_BLOCK_ITEM.setColor(result, GiftIt.GIFT_PAPER.getColor(paperStack));
-		CompoundTag blockEntityTag = result.getOrCreateSubTag("BlockEntityTag");
+		NbtCompound blockEntityTag = result.getOrCreateSubNbt("BlockEntityTag");
 		blockEntityTag.putInt("WrappedType", GiftWrappedType.STACK.ordinal());
 		blockEntityTag.putInt("PaperDamage", paperStack.getDamage());
-		CompoundTag otherTag = otherStack.toTag(new CompoundTag());
+		NbtCompound otherTag = otherStack.writeNbt(new NbtCompound());
 		blockEntityTag.put("WrappedData", otherTag);
 
 		return result;

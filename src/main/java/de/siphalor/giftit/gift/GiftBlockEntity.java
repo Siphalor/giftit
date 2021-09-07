@@ -1,5 +1,6 @@
 package de.siphalor.giftit.gift;
 
+import de.siphalor.giftit.Config;
 import de.siphalor.giftit.GiftIt;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,53 +12,54 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @SuppressWarnings("WeakerAccess")
 public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntityClientSerializable {
 	protected GiftWrappedType wrappedType;
-	protected CompoundTag wrappedBlockState;
-	protected CompoundTag wrappedData;
+	protected NbtCompound wrappedBlockState;
+	protected NbtCompound wrappedData;
 	protected int color;
 	protected int paperDamage;
 
 	protected Text customName;
 
-	public GiftBlockEntity(BlockState blockState, CompoundTag blockData, int paperDamage, int color, Text customName) {
-		this(paperDamage, color, customName);
-        setWrappedBlockState(blockState, blockData);
+	public GiftBlockEntity(BlockPos pos, BlockState state, BlockState wrappedState, NbtCompound blockData, int paperDamage, int color, Text customName) {
+		this(pos, state, paperDamage, color, customName);
+        setWrappedBlockState(wrappedState, blockData);
 	}
 
-	public GiftBlockEntity(ItemStack itemStack, int paperDamage, int color, Text customName) {
-		this(paperDamage, color, customName);
+	public GiftBlockEntity(BlockPos pos, BlockState state, ItemStack itemStack, int paperDamage, int color, Text customName) {
+		this(pos, state, paperDamage, color, customName);
 		setWrappedStack(itemStack);
 	}
 
-	public GiftBlockEntity(Entity entity, int paperDamage, int color, Text customName) {
-		this(paperDamage, color, customName);
+	public GiftBlockEntity(BlockPos pos, BlockState state, Entity entity, int paperDamage, int color, Text customName) {
+		this(pos, state, paperDamage, color, customName);
 		setWrappedEntity(entity);
 	}
 
-	protected GiftBlockEntity(int paperDamage, int color, Text customName) {
-		super(GiftIt.GIFT_BLOCK_ENTITY_TYPE);
+	protected GiftBlockEntity(BlockPos pos, BlockState state, int paperDamage, int color, Text customName) {
+		super(GiftIt.GIFT_BLOCK_ENTITY_TYPE, pos, state);
 		this.paperDamage = paperDamage;
 		this.color = color;
 		this.customName = customName;
 	}
 
-	public GiftBlockEntity() {
-		this(Blocks.AIR.getDefaultState(), null, 0, -1, null);
+	public GiftBlockEntity(BlockPos pos, BlockState state) {
+		this(pos, state, Blocks.AIR.getDefaultState(), null, 0, -1, null);
 	}
 
 	public GiftWrappedType getWrappedType() {
 		return wrappedType;
 	}
 
-	public void setWrappedBlockState(BlockState blockState, CompoundTag blockData) {
+	public void setWrappedBlockState(BlockState blockState, NbtCompound blockData) {
 		wrappedType = GiftWrappedType.BLOCK;
 		wrappedBlockState = NbtHelper.fromBlockState(blockState);
 		wrappedData = blockData;
@@ -69,24 +71,24 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 
 	public void setWrappedStack(ItemStack stack) {
 		wrappedType = GiftWrappedType.STACK;
-		wrappedData = stack.toTag(new CompoundTag());
+		wrappedData = stack.writeNbt(new NbtCompound());
 	}
 
 	public ItemStack getWrappedStack() {
-		return ItemStack.fromTag(wrappedData);
+		return ItemStack.fromNbt(wrappedData);
 	}
 
 	public void setWrappedEntity(Entity entity) {
 		wrappedType = GiftWrappedType.ENTITY;
-		wrappedData = new CompoundTag();
-		entity.saveToTag(wrappedData);
+		wrappedData = new NbtCompound();
+		entity.saveSelfNbt(wrappedData);
 	}
 
 	public Entity getWrappedEntity(World world) {
-		return EntityType.getEntityFromTag(wrappedData, world).orElse(null);
+		return EntityType.getEntityFromNbt(wrappedData, world).orElse(null);
 	}
 
-	public CompoundTag getWrappedData() {
+	public NbtCompound getWrappedData() {
 		return wrappedData;
 	}
 
@@ -112,8 +114,8 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	}
 
 	@Override
-	public void fromTag(BlockState blockState, CompoundTag compoundTag) {
-	super.fromTag(blockState, compoundTag);
+	public void readNbt(NbtCompound compoundTag) {
+	super.readNbt(compoundTag);
 		if (compoundTag.contains("WrappedType", 3)) {
 			int type = compoundTag.getInt("WrappedType");
 			GiftWrappedType[] wrappedTypes = GiftWrappedType.values();
@@ -149,7 +151,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 		}
 
 		color = compoundTag.getInt("color");
-		if(!GiftIt.CONFIG.unbreakableGiftPaper) {
+		if(!Config.unbreakableGiftPaper) {
 			if(compoundTag.contains("PaperDamage"))
 				paperDamage = compoundTag.getInt("PaperDamage");
 			else
@@ -161,8 +163,8 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag compoundTag) {
-		super.toTag(compoundTag);
+	public NbtCompound writeNbt(NbtCompound compoundTag) {
+		super.writeNbt(compoundTag);
 
 		compoundTag.putInt("WrappedType", wrappedType.ordinal());
 		switch (wrappedType) {
@@ -181,7 +183,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 		if(color >= 0) {
 			compoundTag.putInt("color", color);
 		}
-		if(!GiftIt.CONFIG.unbreakableGiftPaper) {
+		if(!Config.unbreakableGiftPaper) {
 			compoundTag.putInt("PaperDamage", paperDamage);
 		}
 
@@ -193,14 +195,14 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 
 	@Environment(EnvType.CLIENT)
 	@Override
-	public void fromClientTag(CompoundTag tag) {
+	public void fromClientTag(NbtCompound tag) {
 		color = tag.getInt("color");
 		if(world != null)
 			MinecraftClient.getInstance().worldRenderer.updateBlock(world, pos, null, getCachedState(), 3);
 	}
 
 	@Override
-	public CompoundTag toClientTag(CompoundTag tag) {
+	public NbtCompound toClientTag(NbtCompound tag) {
 		tag.putInt("color", color);
 		return tag;
 	}

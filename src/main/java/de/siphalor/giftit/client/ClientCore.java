@@ -22,7 +22,7 @@ public class ClientCore implements ClientModInitializer {
 		ColorProviderRegistry.ITEM.register((itemStack, layer) -> {
 			int baseColor = ((DyeableItem) itemStack.getItem()).getColor(itemStack);
 			if(layer == 1) {
-				return baseColor ^ 0x00ffffff;
+				return baseColor ^ 0xffffff;
 			} else {
 				return baseColor;
 			}
@@ -33,7 +33,7 @@ public class ClientCore implements ClientModInitializer {
 				if (blockEntity instanceof GiftBlockEntity) {
 					int baseColor = ((GiftBlockEntity) blockEntity).getColor();
 					if (tintIndex == 1) {
-						return baseColor ^ 0x00ffffff;
+						return baseColor ^ 0xffffff;
 					} else {
 						return baseColor;
 					}

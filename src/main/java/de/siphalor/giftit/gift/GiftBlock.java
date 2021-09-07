@@ -1,5 +1,6 @@
 package de.siphalor.giftit.gift;
 
+import de.siphalor.giftit.Config;
 import de.siphalor.giftit.GiftIt;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -13,7 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -24,8 +25,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class GiftBlock extends Block implements BlockEntityProvider {
@@ -59,25 +60,23 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 		return PistonBehavior.DESTROY;
 	}
 
+	@Nullable
 	@Override
-	public BlockEntity createBlockEntity(BlockView blockView) {
-		return new GiftBlockEntity();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new GiftBlockEntity(pos, state);
 	}
 
 	public void unwrap(World world, BlockPos blockPos, Direction activationDirection, PlayerEntity playerEntity) {
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
-		if (blockEntity instanceof GiftBlockEntity) {
-			GiftBlockEntity giftBlockEntity = (GiftBlockEntity) blockEntity;
-
+		if (blockEntity instanceof GiftBlockEntity giftBlockEntity) {
 			if (playerEntity instanceof ServerPlayerEntity && giftBlockEntity.hasCustomName()) {
-				((ServerPlayerEntity) playerEntity).networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, giftBlockEntity.getCustomName()));
+				((ServerPlayerEntity) playerEntity).networkHandler.sendPacket(new TitleS2CPacket(giftBlockEntity.getCustomName()));
 			}
 
 			boolean dropAround = false;
 			switch (giftBlockEntity.getWrappedType()) {
-				default:
-				case BLOCK: {
-					CompoundTag blockData = giftBlockEntity.getWrappedData();
+				case BLOCK -> {
+					NbtCompound blockData = giftBlockEntity.getWrappedData();
 					BlockState newBlockState = giftBlockEntity.getWrappedBlockState();
 					Clearable.clear(blockEntity);
 
@@ -89,7 +88,7 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 							blockData.putInt("x", blockPos.getX());
 							blockData.putInt("y", blockPos.getY());
 							blockData.putInt("z", blockPos.getZ());
-							newBlockEntity.fromTag(newBlockState, blockData);
+							newBlockEntity.readNbt(blockData);
 							newBlockEntity.markDirty();
 						}
 					}
@@ -101,8 +100,7 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 					}
 					dropAround = newBlockState.isFullCube(world, blockPos);
 				}
-				break;
-				case STACK: {
+				case STACK -> {
 					ItemStack stack = giftBlockEntity.getWrappedStack();
 					Clearable.clear(blockEntity);
 
@@ -111,8 +109,7 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 					ItemEntity itemEntity = new ItemEntity(world, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, stack);
 					world.spawnEntity(itemEntity);
 				}
-				break;
-				case ENTITY: {
+				case ENTITY -> {
 					Entity entity = giftBlockEntity.getWrappedEntity(world);
 					Clearable.clear(blockEntity);
 
@@ -121,16 +118,15 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 					if (entity != null) {
 						entity.setVelocity(Vec3d.ZERO);
 						entity.setOnGround(false);
-						entity.refreshPositionAndAngles(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, entity.yaw, entity.pitch);
+						entity.refreshPositionAndAngles(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, entity.getYaw(), entity.getPitch());
 						world.spawnEntity(entity);
 					}
 				}
-				break;
 			}
 
-			if (GiftIt.CONFIG.unbreakableGiftPaper || giftBlockEntity.getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && (playerEntity == null || !playerEntity.isCreative())) {
+			if (Config.unbreakableGiftPaper || giftBlockEntity.getPaperDamage() < GiftIt.GIFT_PAPER.getMaxDamage() - 1 && (playerEntity == null || !playerEntity.isCreative())) {
 				ItemStack itemStack = new ItemStack(GiftIt.GIFT_PAPER);
-				if (!GiftIt.CONFIG.unbreakableGiftPaper)
+				if (!Config.unbreakableGiftPaper)
 					itemStack.setDamage(giftBlockEntity.getPaperDamage() + 1);
 				GiftIt.GIFT_PAPER.setColor(itemStack, giftBlockEntity.color);
 				BlockPos.Mutable itemPos = blockPos.mutableCopy();

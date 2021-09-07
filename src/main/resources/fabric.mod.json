@@ -25,8 +25,8 @@
 		"client": [
 			"de.siphalor.giftit.client.ClientCore"
 		],
-		"tweed:config": [
-			"de.siphalor.giftit.GiftIt::CONFIG"
+		"tweed4:config": [
+			"de.siphalor.giftit.Config"
 		]
 	},
 	"mixins": [

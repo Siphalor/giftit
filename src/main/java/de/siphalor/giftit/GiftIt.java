@@ -6,7 +6,8 @@ import de.siphalor.giftit.gift.GiftBlockItem;
 import de.siphalor.giftit.gift.GiftPaperItem;
 import de.siphalor.giftit.recipe.StackWrappingRecipe;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.tag.TagRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
@@ -35,19 +36,20 @@ import java.util.List;
 public class GiftIt implements ModInitializer {
 	public static final String MOD_ID = "giftit";
 
-	public static final Config CONFIG = new Config();
-
 	public static final Block GIFT_BLOCK = Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "gift"), new GiftBlock());
 	public static final GiftBlockItem GIFT_BLOCK_ITEM = Registry.register(Registry.ITEM, new Identifier(MOD_ID, "gift"), new GiftBlockItem(GIFT_BLOCK));
-    public static final BlockEntityType<GiftBlockEntity> GIFT_BLOCK_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "gift"), BlockEntityType.Builder.create(GiftBlockEntity::new, GIFT_BLOCK).build(null));
+    public static final BlockEntityType<GiftBlockEntity> GIFT_BLOCK_ENTITY_TYPE = Registry.register(
+			Registry.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "gift"),
+		    FabricBlockEntityTypeBuilder.create(GiftBlockEntity::new, GIFT_BLOCK).build()
+    );
 
     public static final GiftPaperItem GIFT_PAPER = Registry.register(Registry.ITEM, new Identifier(MOD_ID, "gift_paper"), new GiftPaperItem());
 
     public static final SoundEvent GIFT_WRAP_SOUND = registerSound("gift.wrap");
     public static final SoundEvent GIFT_UNWRAP_SOUND = registerSound("gift.unwrap");
 
-    public static final Tag<Block> NONWRAPPABLE_BLOCKS = TagRegistry.block(new Identifier(MOD_ID, "nonwrappable"));
-    public static final Tag<EntityType<?>> NONWRAPPABLE_ENTITIES = TagRegistry.entityType(new Identifier(MOD_ID, "nonwrappable"));
+    public static final Tag<Block> NONWRAPPABLE_BLOCKS = TagFactory.BLOCK.create(new Identifier(MOD_ID, "nonwrappable"));
+    public static final Tag<EntityType<?>> NONWRAPPABLE_ENTITIES = TagFactory.ENTITY_TYPE.create(new Identifier(MOD_ID, "nonwrappable"));
 
     public static final RecipeSerializer<StackWrappingRecipe> STACK_WRAPPING_RECIPE_SERIALIZER = Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MOD_ID, "stack_wrapping"), new SpecialRecipeSerializer<>(StackWrappingRecipe::new));
 
@@ -57,14 +59,14 @@ public class GiftIt implements ModInitializer {
 			@Override
 			public ItemStack dispenseSilently(BlockPointer blockPointer, ItemStack itemStack) {
 				if (!blockPointer.getWorld().isClient()) {
-					BlockPos targetPos = blockPointer.getBlockPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING));
+					BlockPos targetPos = blockPointer.getPos().offset(blockPointer.getBlockState().get(DispenserBlock.FACING));
 					setSuccess(
 							GIFT_PAPER.tryWrapBlock(itemStack, blockPointer.getWorld(), targetPos)
 									|| tryWrapEntity(blockPointer, itemStack, targetPos)
 					);
 					if (isSuccess()) {
 						itemStack.decrement(1);
-						blockPointer.getWorld().playSound(null, blockPointer.getBlockPos(), GIFT_WRAP_SOUND, SoundCategory.BLOCKS, 1.0F, 1.0F);
+						blockPointer.getWorld().playSound(null, blockPointer.getPos(), GIFT_WRAP_SOUND, SoundCategory.BLOCKS, 1.0F, 1.0F);
 					}
 				}
 				return itemStack;
@@ -74,7 +76,7 @@ public class GiftIt implements ModInitializer {
 				if (blockPointer.getWorld().getBlockState(targetPos).isAir()) {
 					List<Entity> entities = blockPointer.getWorld().getEntitiesByClass(Entity.class, new Box(targetPos), EntityPredicates.VALID_ENTITY);
 					for (Entity entity : entities) {
-						if (CONFIG.enableEntityWrapping && entity instanceof LivingEntity) {
+						if (Config.enableEntityWrapping && entity instanceof LivingEntity) {
 							if (GIFT_PAPER.tryWrapEntity(itemStack, blockPointer.getWorld(), entity)) {
 								return true;
 							}
@@ -83,11 +85,15 @@ public class GiftIt implements ModInitializer {
 							World world = blockPointer.getWorld();
 							entity.stopRiding();
 							entity.removeAllPassengers();
-							entity.removed = true;
+							entity.remove(Entity.RemovalReason.KILLED);
 							ItemStack stack = ((ItemEntity) entity).getStack();
 
 							world.setBlockState(targetPos, GIFT_BLOCK.getDefaultState());
-							world.setBlockEntity(targetPos, new GiftBlockEntity(stack, itemStack.getDamage(), GIFT_PAPER.getColor(itemStack), itemStack.hasCustomName() ? itemStack.getName() : null));
+							GiftBlockEntity giftBlockEntity = new GiftBlockEntity(
+									targetPos, GIFT_BLOCK.getDefaultState(),
+									stack, itemStack.getDamage(), GIFT_PAPER.getColor(itemStack), itemStack.hasCustomName() ? itemStack.getName() : null
+							);
+							world.addBlockEntity(giftBlockEntity);
 							return true;
 						}
 					}

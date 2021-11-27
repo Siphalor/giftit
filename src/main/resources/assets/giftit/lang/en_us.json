@@ -7,6 +7,7 @@
 	"tweed4_tailor_screen.screen.giftit.max-paper-damage": "Gift Paper Uses",
 	"tweed4_tailor_screen.screen.giftit.restrict-to-inventories": "Restrict to Inventories",
 	"tweed4_tailor_screen.screen.giftit.forbidden-blocks": "Forbidden Blocks",
+	"tweed4_tailor_screen.screen.giftit.enable-block-unwrap-rotation": "Enable Block Unwrap Rotation",
 	"tweed4_tailor_screen.screen.giftit.allow-gift-recursion": "Allow Gift Recursion",
 	"tweed4_tailor_screen.screen.giftit.enable-entity-wrapping": "Enable Entity Wrapping",
 	"tweed4_tailor_screen.screen.giftit.forbid-large-entities": "Forbid Wrapping Large Entities",

@@ -18,6 +18,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Clearable;
 import net.minecraft.util.Hand;
@@ -79,6 +81,17 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 					NbtCompound blockData = giftBlockEntity.getWrappedData();
 					BlockState newBlockState = giftBlockEntity.getWrappedBlockState();
 					Clearable.clear(blockEntity);
+
+					if (Config.enableBlockUnwrapRotation) {
+						for (Property<?> property : newBlockState.getProperties()) {
+							if (property instanceof DirectionProperty directionProperty) {
+								if (directionProperty.getValues().contains(activationDirection)) {
+									newBlockState = newBlockState.with(directionProperty, activationDirection);
+									break;
+								}
+							}
+						}
+					}
 
 					world.removeBlock(blockPos, false);
 					world.setBlockState(blockPos, newBlockState, 2);

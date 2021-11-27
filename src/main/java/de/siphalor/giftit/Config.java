@@ -34,6 +34,11 @@ public class Config {
 	public static List<String> forbiddenBlocks = new ArrayList<>();
 
 	@AConfigEntry(
+			comment = "Rotates blocks that are direction aware when they are unwrapped."
+	)
+	public static boolean enableBlockUnwrapRotation = true;
+
+	@AConfigEntry(
 			comment = "Allow gift recursion (packing gifts into gifts)."
 	)
 	public static boolean allowGiftRecursion = true;

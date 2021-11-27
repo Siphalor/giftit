@@ -6,8 +6,8 @@ plugins {
 	id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = "${project.mod_version}+mc${project.minecraft_version}"
@@ -38,10 +38,10 @@ dependencies {
 	include(modImplementation("de.siphalor.tweed4:tweed4-data-$minecraft_major_version:1.2.0"))
 	include(modImplementation("de.siphalor.tweed4:tweed4-data-hjson-$minecraft_major_version:1.1.0"))
 	include(modImplementation("de.siphalor.tweed4:tweed4-tailor-screen-$minecraft_major_version:1.0.2"))
-	include(modImplementation("de.siphalor.tweed4:tweed4-tailor-coat-$minecraft_major_version:1.0.1"))
-	include(modImplementation("de.siphalor:coat-$minecraft_major_version:1.0.0-beta.12"))
+	include(modImplementation("de.siphalor.tweed4:tweed4-tailor-coat-$minecraft_major_version:1.0.2"))
+	include(modImplementation("de.siphalor:coat-$minecraft_major_version:1.0.0-beta.15"))
 
-	modImplementation("com.terraformersmc:modmenu:2.0.10")
+	modImplementation("com.terraformersmc:modmenu:3.0.0")
 
 	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 }
@@ -133,9 +133,10 @@ if (project.hasProperty("siphalorCurseForgeApi")) {
 			changelogType = "markdown"
 			changelog = getChangelog()
 			addGameVersion("Fabric")
-			for (version in ((String) project.mod_mc_versions).split(";")) {
-				addGameVersion(version)
-			}
+			//for (version in ((String) project.mod_mc_versions).split(";")) {
+			//	addGameVersion(version)
+			//}
+			addGameVersion("1.18-Snapshot")
 			mainArtifact(remapJar) {
 				displayName = "[${project.mod_mc_version_specifier}] ${project.mod_version}"
 			}

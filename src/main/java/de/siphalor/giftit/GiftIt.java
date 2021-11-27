@@ -1,5 +1,6 @@
 package de.siphalor.giftit;
 
+import de.siphalor.giftit.client.ClientCore;
 import de.siphalor.giftit.gift.GiftBlock;
 import de.siphalor.giftit.gift.GiftBlockEntity;
 import de.siphalor.giftit.gift.GiftBlockItem;
@@ -9,6 +10,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
 import net.minecraft.block.dispenser.FallibleItemDispenserBehavior;
@@ -107,5 +109,9 @@ public class GiftIt implements ModInitializer {
 	private static SoundEvent registerSound(String name) {
     	Identifier identifier = new Identifier(MOD_ID, name);
     	return Registry.register(Registry.SOUND_EVENT, identifier, new SoundEvent(identifier));
+	}
+
+	public static void proxyClientUpdateVisualState(World world, BlockPos blockPos, BlockState blockState) {
+		ClientCore.updateVisualState(world, blockPos, blockState);
 	}
 }

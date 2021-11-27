@@ -77,7 +77,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 		}
 
 		if (blockEntity != null) {
-			data = blockEntity.writeNbt(new NbtCompound());
+			data = blockEntity.createNbtWithId();
 		}
 		Clearable.clear(blockEntity);
 		world.removeBlock(blockPos, false);

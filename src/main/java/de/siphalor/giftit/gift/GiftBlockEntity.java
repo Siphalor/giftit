@@ -2,25 +2,25 @@ package de.siphalor.giftit.gift;
 
 import de.siphalor.giftit.Config;
 import de.siphalor.giftit.GiftIt;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.network.Packet;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("WeakerAccess")
-public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntityClientSerializable {
+public class GiftBlockEntity extends BlockEntity implements Nameable {
 	protected GiftWrappedType wrappedType;
 	protected NbtCompound wrappedBlockState;
 	protected NbtCompound wrappedData;
@@ -115,7 +115,7 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 
 	@Override
 	public void readNbt(NbtCompound compoundTag) {
-	super.readNbt(compoundTag);
+		super.readNbt(compoundTag);
 		if (compoundTag.contains("WrappedType", 3)) {
 			int type = compoundTag.getInt("WrappedType");
 			GiftWrappedType[] wrappedTypes = GiftWrappedType.values();
@@ -160,24 +160,25 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 
 		if(compoundTag.contains("CustomName"))
 			customName = Text.Serializer.fromJson(compoundTag.getString("CustomName"));
+
+		if (world != null && world.isClient) {
+			GiftIt.proxyClientUpdateVisualState(world, pos, getCachedState());
+		}
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound compoundTag) {
+	protected void writeNbt(NbtCompound compoundTag) {
 		super.writeNbt(compoundTag);
 
 		compoundTag.putInt("WrappedType", wrappedType.ordinal());
 		switch (wrappedType) {
-			case BLOCK:
+			case BLOCK -> {
 				compoundTag.put("WrappedState", wrappedBlockState);
 				if (wrappedData != null) {
 					compoundTag.put("WrappedData", wrappedData);
 				}
-				break;
-			case STACK:
-			case ENTITY:
-				compoundTag.put("WrappedData", wrappedData);
-				break;
+			}
+			case STACK, ENTITY -> compoundTag.put("WrappedData", wrappedData);
 		}
 
 		if(color >= 0) {
@@ -190,20 +191,18 @@ public class GiftBlockEntity extends BlockEntity implements Nameable, BlockEntit
 		if(hasCustomName()) {
 			compoundTag.putString("CustomName", Text.Serializer.toJson(customName));
 		}
-		return compoundTag;
 	}
 
-	@Environment(EnvType.CLIENT)
+	@Nullable
 	@Override
-	public void fromClientTag(NbtCompound tag) {
-		color = tag.getInt("color");
-		if(world != null)
-			MinecraftClient.getInstance().worldRenderer.updateBlock(world, pos, null, getCachedState(), 3);
+	public Packet<ClientPlayPacketListener> toUpdatePacket() {
+		return BlockEntityUpdateS2CPacket.create(this);
 	}
 
 	@Override
-	public NbtCompound toClientTag(NbtCompound tag) {
-		tag.putInt("color", color);
-		return tag;
+	public NbtCompound toInitialChunkDataNbt() {
+		NbtCompound nbt = super.toInitialChunkDataNbt();
+		nbt.putInt("color", color);
+		return nbt;
 	}
 }

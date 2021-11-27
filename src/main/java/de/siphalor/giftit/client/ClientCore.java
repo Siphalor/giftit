@@ -6,10 +6,14 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.Item;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import static de.siphalor.giftit.GiftIt.*;
 
@@ -43,5 +47,9 @@ public class ClientCore implements ClientModInitializer {
 		}, GIFT_BLOCK);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(GIFT_BLOCK, RenderLayer.getCutoutMipped());
+	}
+
+	public static void updateVisualState(World world, BlockPos blockPos, BlockState blockState) {
+		MinecraftClient.getInstance().worldRenderer.updateBlock(world, blockPos, null, blockState, 3);
 	}
 }

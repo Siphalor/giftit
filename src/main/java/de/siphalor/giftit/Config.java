@@ -64,7 +64,7 @@ public class Config {
 
 	@AConfigListener()
 	public static void onPaperDamageReload() {
-		((IItem) GiftIt.GIFT_PAPER).setMaxDamage(maxPaperDamage == 0 ? 0 : maxPaperDamage - 1);
+		((IItem) GiftIt.GIFT_PAPER).setMaxDamage(maxPaperDamage);
 		unbreakableGiftPaper = maxPaperDamage == 0;
 		((IItem) GiftIt.GIFT_PAPER).setMaxCount(maxPaperDamage <= 1 ? 64 : 1);
 	}

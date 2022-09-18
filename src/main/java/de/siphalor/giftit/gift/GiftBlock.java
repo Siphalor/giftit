@@ -20,6 +20,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Property;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Clearable;
 import net.minecraft.util.Hand;
@@ -33,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("deprecation")
 public class GiftBlock extends Block implements BlockEntityProvider {
 	public GiftBlock() {
-		super(FabricBlockSettings.of(Material.WOOL).breakByHand(true));
+		super(FabricBlockSettings.of(Material.WOOL));
 	}
 
 	@Override
@@ -72,7 +73,11 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
 		if (blockEntity instanceof GiftBlockEntity giftBlockEntity) {
 			if (playerEntity instanceof ServerPlayerEntity && giftBlockEntity.hasCustomName()) {
-				((ServerPlayerEntity) playerEntity).networkHandler.sendPacket(new TitleS2CPacket(giftBlockEntity.getCustomName()));
+                Text customName = giftBlockEntity.getCustomName();
+                if (customName.getStyle().getColor() == null) {
+                    customName = customName.copy().styled(style -> style.withColor(giftBlockEntity.getColor()));
+                }
+                ((ServerPlayerEntity) playerEntity).networkHandler.sendPacket(new TitleS2CPacket(customName));
 			}
 
 			boolean dropAround = false;
@@ -142,6 +147,9 @@ public class GiftBlock extends Block implements BlockEntityProvider {
 				if (!Config.unbreakableGiftPaper)
 					itemStack.setDamage(giftBlockEntity.getPaperDamage() + 1);
 				GiftIt.GIFT_PAPER.setColor(itemStack, giftBlockEntity.color);
+                if (giftBlockEntity.hasCustomName()) {
+                    itemStack.setCustomName(giftBlockEntity.getCustomName());
+                }
 				BlockPos.Mutable itemPos = blockPos.mutableCopy();
 				if (dropAround) {
 					itemPos.move(0, 1, 0);

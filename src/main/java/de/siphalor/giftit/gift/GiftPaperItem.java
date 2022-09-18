@@ -59,7 +59,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 
 	public boolean tryWrapBlock(ItemStack itemStack, World world, BlockPos blockPos) {
 		BlockState blockState = world.getBlockState(blockPos);
-		if (GiftIt.NONWRAPPABLE_BLOCKS.contains(blockState.getBlock())) return false;
+        if (blockState.isIn(GiftIt.NONWRAPPABLE_BLOCKS)) return false;
 		if (!Config.forbiddenBlocks.isEmpty()) {
 			if (Config.forbiddenBlocks.contains(Registry.BLOCK.getId(blockState.getBlock()).toString())) {
 				return false;
@@ -96,7 +96,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 
 	public boolean tryWrapEntity(ItemStack itemStack, World world, Entity entity) {
 		if (!Config.enableEntityWrapping) return false;
-		if (GiftIt.NONWRAPPABLE_ENTITIES.contains(entity.getType())) return false;
+        if (entity.getType().isIn(GiftIt.NONWRAPPABLE_ENTITIES)) return false;
 		if (!Config.forbiddenEntities.isEmpty()) {
 			if (Config.forbiddenEntities.contains(Registry.ENTITY_TYPE.getId(entity.getType()).toString())) {
 				return false;
@@ -134,7 +134,7 @@ public class GiftPaperItem extends Item implements DyeableGift {
 
 		if (
 				world.getBlockState(blockPos).getMaterial().isReplaceable()
-				&& world.getOtherEntities(entity, new Box(blockPos), e -> e.collides() && !e.isSpectator()).isEmpty()
+				&& world.getOtherEntities(entity, new Box(blockPos), e -> e.isCollidable() && !e.isSpectator()).isEmpty()
 		) {
 			world.setBlockState(blockPos, GiftIt.GIFT_BLOCK.getDefaultState());
 			world.addBlockEntity(blockEntity);
